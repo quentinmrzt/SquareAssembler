@@ -13,6 +13,8 @@ def test(event):
     print("Couleur: ",plateau.getCouleur(x,y))
     print("C'est case est supprimable :", plateau.estSupprimable(x,y))
     plateau.supprime(x,y)
+    plateau.gravite()
+    plateau.decalage()
     maj()
 
      

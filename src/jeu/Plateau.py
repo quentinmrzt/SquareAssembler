@@ -11,7 +11,7 @@ class Plateau:
         self.tailleX = 20
         self.tailleY = 20
         self.nbCouleur = 8 
-        self.listeCouleur = ["white","red","blue","yellow","green","cyan","magenta","violet","teal"]
+        self.listeCouleur = ["white","red","blue","yellow","green","cyan","magenta","violet","orange"]
         
         self.aleatoire()
                         
@@ -95,3 +95,45 @@ class Plateau:
                 
         if(x>0 and self.l_map[y][x-1]==couleur): # à gauche
             self.parcoursProfondeurSupprime(x-1, y)
+            
+    def gravite(self):
+        y = self.tailleY-1
+
+        while(y>=0):
+            x = 0
+            while(x<self.tailleX):
+                if(self.l_map[y][x] == 0):
+                    posY = y
+                    while(posY>=0 and self.l_map[posY][x] == 0):
+                        posY = posY-1
+                    
+                    if(posY>=0):
+                        self.l_map[y][x] = self.l_map[posY][x]
+                        self.l_map[posY][x] = 0
+                x = x+1
+            y = y - 1
+            
+    def decalage(self):
+        y = self.tailleY-1
+        x = 0
+        decalage = 0
+        
+        while(x<self.tailleX):
+            i = y
+            if(self.l_map[y][x]!=0 and decalage!=0):
+                while(i>=0):
+                    self.l_map[i][x-decalage] = self.l_map[i][x]
+                    self.l_map[i][x] = 0
+                    i = i-1
+            else:
+                ligneVide=True
+                while(i>=0 and ligneVide):
+                    if(self.l_map[i][x] != 0):
+                        ligneVide = False
+                    i = i-1
+    
+                if(ligneVide):
+                    print("Ligne vide en ",x)
+                    decalage = decalage + 1
+            x = x+1
+            
