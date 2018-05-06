@@ -3,18 +3,17 @@ from tkinter import *
 from tkinter.messagebox import showinfo
 import random
 
+from src.jeu import Plateau
+
 
 
 def test(event):
-    global tailleCarre, listeCouleur, l_map
+    global tailleCarre, plateau
     x = (int)(event.x/tailleCarre)
     y = (int)(event.y/tailleCarre)
     print("[",x,"/",y,"]")
-    print("Couleur: ",listeCouleur[l_map[y][x]])
+    print("Couleur: ",plateau.getCouleur(x,y))
     
-    
-
-
 root = Tk()
 root.title("Square Assembler")
 root.geometry('500x500+200+200')
@@ -43,45 +42,23 @@ menubar.add_cascade(label="A propos", menu=editmenu)
 # affichage du menu
 root.config(menu=menubar)
 
-
-# Generation de la map
-tailleX = 20; tailleY = 20
-nbCouleur = 8
-nbParCouleur = [int((tailleX*tailleY)/nbCouleur)]*nbCouleur
-listeCouleur = ["red","blue","yellow","green","cyan","magenta","violet","teal"]
-
-l_map = [[0]*tailleX for i in range(tailleY)]
-x = 0
-while x<tailleX:
-    y = 0
-    while y<tailleY:
-        trouve = False
-        while(not trouve):
-            rdm =  random.randint(0,nbCouleur-1)
-            if(nbParCouleur[rdm]!=0):
-                nbParCouleur[rdm] = nbParCouleur[rdm]-1
-                l_map[y][x] = rdm
-                trouve = True
-        y = y+1
-    x = x+1
-
+plateau = Plateau.Plateau()
 
 # Affichage de la map
 tailleCarre = 20
-canvas = Canvas(root, width=tailleCarre*tailleX, height=tailleCarre*tailleY, background='grey')
+canvas = Canvas(root, width=tailleCarre*plateau.tailleX, height=tailleCarre*plateau.tailleY, background='grey')
 
 x = 0
-while x<tailleX:
+while x<plateau.tailleX:
     y = 0
-    while y<tailleY: 
-        image = canvas.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=listeCouleur[l_map[y][x]])
+    while y<plateau.tailleY: 
+        image = canvas.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=plateau.getCouleur(x,y))
         y = y+1
     x = x+1
 
 
 
 canvas.bind('<Button-1>', test)
-
 
 
 #canvas.coords(image, 0, 0, 5, 5)
