@@ -1,6 +1,6 @@
 #-*-coding: Latin-1-*-
 from tkinter import *
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import *
 from src.jeu import Plateau
 
 def cliqueGauche(event):
@@ -14,9 +14,7 @@ def cliqueGauche(event):
         plateau.gravite()
         plateau.decalage()
         maj()
-        
-        print(score)
-    
+            
 def cliqueDroit(event):
     global plateau
     
@@ -49,20 +47,32 @@ def maj():
     canvasScore.grid(row=0,column=1)
 
 def aPropos():
-    showinfo("Numéro d'anonymat", "Quentin Morizot")
+    showinfo("Numéro d'anonymat", "Quentin Morizot")    
+
+def nouveau():
+    global win
+
+    win = Toplevel(root)
+    win.geometry('300x100+300+300')
+    win.title("Changement de plateau")
+    message = "Choisissez la taille du plateau:"
+    Label(win, text=message).grid(row=0,column=0,columnspan=2)
+    Button(win,text='10x10', command=nouveau10x10).grid(row=1,column=0,padx=0)
+    Button(win,text='20x20', command=nouveau20x20).grid(row=1,column=1,padx=0)
     
 def nouveau10x10():
-    global plateau, score
+    global plateau, score, win
     plateau = Plateau.Plateau(10,10)
     score = 0
     maj()
+    win.destroy()
     
 def nouveau20x20():
-    global plateau, score
+    global plateau, score, win
     plateau = Plateau.Plateau()
     score = 0
     maj()
-
+    win.destroy()
 
 root = Tk()
 root.resizable(width=False,height=False)
@@ -73,8 +83,7 @@ score = 0
 menubar = Menu(root)
 # Menu Jeu et ses sous menu
 filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Nouveau 10x10", command=nouveau10x10)
-filemenu.add_command(label="Nouveau 20x20", command=nouveau20x20)
+filemenu.add_command(label="Nouveau", command=nouveau)
 filemenu.add_separator()
 filemenu.add_command(label="Quitter", command=root.quit)
 menubar.add_cascade(label="Jeu", menu=filemenu)

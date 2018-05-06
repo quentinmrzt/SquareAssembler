@@ -36,9 +36,9 @@ class Plateau:
     def getCouleur(self, x, y):
         return self.listeCouleur[self.l_map[y][x]]
     
-    def maquarge(self,x,y):
+    def marquage(self,x,y):
         self.l_map[y][x] = -self.l_map[y][x]
-    def demarquarge(self):
+    def demarquage(self):
         x=0
         while(x<self.tailleX):
             y=0
@@ -53,7 +53,7 @@ class Plateau:
             return 0
         else:
             nbVoisin = self.parcoursProfondeurNbVoisin(x,y)
-            self.demarquarge()
+            self.demarquage()
             if (nbVoisin>=3):
                 return nbVoisin
             else:
@@ -62,7 +62,7 @@ class Plateau:
     def parcoursProfondeurNbVoisin(self,x,y):
         couleur = self.l_map[y][x]
         nbVoisin = 1
-        self.maquarge(x, y)
+        self.marquage(x, y)
         
         if(y>0 and self.l_map[y-1][x]==couleur): # en haut
             nbVoisin += self.parcoursProfondeurNbVoisin(x, y-1)
