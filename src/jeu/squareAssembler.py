@@ -1,20 +1,21 @@
 #-*-coding: Latin-1-*-
 from tkinter import *
 from tkinter.messagebox import showinfo
-import random
 from src.jeu import Plateau
 
 def cliqueGauche(event):
-    global plateau
+    global plateau, score
     
     if(plateau!=None):
         x = (int)(event.x/tailleCarre)
         y = (int)(event.y/tailleCarre)
     
-        plateau.supprime(x,y)
+        score += plateau.supprime(x,y)
         plateau.gravite()
         plateau.decalage()
         maj()
+        
+        print(score)
     
 def cliqueDroit(event):
     global plateau
@@ -29,7 +30,7 @@ def cliqueDroit(event):
         maj()
      
 def maj():
-    global canvasPlateau, tailleCarre
+    global canvasPlateau, canvasScore, tailleCarre
     
     canvasPlateau.delete("all")
     tailleCarre = 600/plateau.tailleX
@@ -42,18 +43,24 @@ def maj():
             y = y+1
         x = x+1
     canvasPlateau.grid(row=0,column=0,padx=0)
+    
+    canvasScore.delete("all")
+    canvasScore.create_text(50,50,text="Score = "+str(score))
+    canvasScore.grid(row=0,column=1)
 
 def aPropos():
     showinfo("Numéro d'anonymat", "Quentin Morizot")
     
 def nouveau10x10():
-    global plateau
+    global plateau, score
     plateau = Plateau.Plateau(10,10)
+    score = 0
     maj()
     
 def nouveau20x20():
-    global plateau
+    global plateau, score
     plateau = Plateau.Plateau()
+    score = 0
     maj()
 
 
@@ -61,7 +68,7 @@ root = Tk()
 root.resizable(width=False,height=False)
 root.title("Square Assembler")
 root.geometry('810x605+200+200')
-
+score = 0
 # Menu
 menubar = Menu(root)
 # Menu Jeu et ses sous menu

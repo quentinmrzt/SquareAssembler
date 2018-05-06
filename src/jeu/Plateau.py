@@ -48,13 +48,16 @@ class Plateau:
                 y = y+1
             x = x+1
     
-    def estSupprimable(self,x,y):
+    def nbSupprimable(self,x,y):
         if(self.l_map[y][x] == 0):
-            return False
+            return 0
         else:
             nbVoisin = self.parcoursProfondeurNbVoisin(x,y)
             self.demarquarge()
-            return nbVoisin>=3
+            if (nbVoisin>=3):
+                return nbVoisin
+            else:
+                return 0
     
     def parcoursProfondeurNbVoisin(self,x,y):
         couleur = self.l_map[y][x]
@@ -77,8 +80,11 @@ class Plateau:
     
     
     def supprime(self,x,y):
-        if(self.estSupprimable(x,y)):
+        nb = self.nbSupprimable(x,y)
+        if(nb!=0):
             self.parcoursProfondeurSupprime(x,y)
+            
+        return nb
     
     def parcoursProfondeurSupprime(self,x,y):
         couleur = self.l_map[y][x]
