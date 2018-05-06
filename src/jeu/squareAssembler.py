@@ -5,14 +5,27 @@ import random
 
 from src.jeu import Plateau
 
-
-
 def test(event):
     global tailleCarre, plateau
     x = (int)(event.x/tailleCarre)
     y = (int)(event.y/tailleCarre)
     print("[",x,"/",y,"]")
     print("Couleur: ",plateau.getCouleur(x,y))
+    print("C'est case est supprimable :", plateau.estSupprimable(x,y))
+    plateau.supprime(x,y)
+    maj()
+
+     
+def maj():
+    global canvas
+    x = 0
+    while x<plateau.tailleX:
+        y = 0
+        while y<plateau.tailleY: 
+            image = canvas.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=plateau.getCouleur(x,y))
+            y = y+1
+        x = x+1
+    canvas.pack()
     
 root = Tk()
 root.title("Square Assembler")
@@ -23,7 +36,8 @@ def aPropos():
 
     
 def nouveau():
-    print("Rien de nouveau")
+    plateau.aleatoire()
+    maj()
 
 menubar = Menu(root)
 
@@ -56,14 +70,9 @@ while x<plateau.tailleX:
         y = y+1
     x = x+1
 
-
-
 canvas.bind('<Button-1>', test)
-
 
 #canvas.coords(image, 0, 0, 5, 5)
 canvas.pack()
-
-
 
 root.mainloop()

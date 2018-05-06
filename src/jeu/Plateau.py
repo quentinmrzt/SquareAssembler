@@ -11,12 +11,13 @@ class Plateau:
         self.tailleX = 20
         self.tailleY = 20
         self.nbCouleur = 8 
-        self.nbParCouleur = [int((self.tailleX*self.tailleY)/self.nbCouleur)] * self.nbCouleur
-        self.listeCouleur = ["red","blue","yellow","green","cyan","magenta","violet","teal"]
+        self.listeCouleur = ["white","red","blue","yellow","green","cyan","magenta","violet","teal"]
         
         self.aleatoire()
                         
     def aleatoire(self):
+        nbParCouleur = [int((self.tailleX*self.tailleY)/self.nbCouleur)] * self.nbCouleur
+        
         self.l_map = [[0]*self.tailleX for i in range(self.tailleY)]
         x = 0
         while x<self.tailleX:
@@ -24,10 +25,9 @@ class Plateau:
             while y<self.tailleY:
                 trouve = False
                 while(not trouve):
-                    rdm =  random.randint(0,self.nbCouleur-1)
-                    print(rdm)
-                    if(self.nbParCouleur[rdm]!=0):
-                        self.nbParCouleur[rdm] = self.nbParCouleur[rdm]-1
+                    rdm =  random.randint(1,self.nbCouleur)
+                    if(nbParCouleur[rdm-1]!=0):
+                        nbParCouleur[rdm-1] = nbParCouleur[rdm-1]-1
                         self.l_map[y][x] = rdm
                         trouve = True
                 y = y+1
@@ -35,3 +35,63 @@ class Plateau:
                         
     def getCouleur(self, x, y):
         return self.listeCouleur[self.l_map[y][x]]
+    
+    def maquarge(self,x,y):
+        self.l_map[y][x] = -self.l_map[y][x]
+    def demarquarge(self):
+        x=0
+        while(x<self.tailleX):
+            y=0
+            while(y<self.tailleY):
+                if(self.l_map[y][x] < 0):
+                    self.l_map[y][x] = self.l_map[y][x]*-1
+                y = y+1
+            x = x+1
+    
+    def estSupprimable(self,x,y):
+        if(self.l_map[y][x] == 0):
+            return False
+        else:
+            nbVoisin = self.parcoursProfondeurNbVoisin(x,y)
+            self.demarquarge()
+            return nbVoisin>=3
+    
+    def parcoursProfondeurNbVoisin(self,x,y):
+        couleur = self.l_map[y][x]
+        nbVoisin = 1
+        self.maquarge(x, y)
+        
+        if(y>0 and self.l_map[y-1][x]==couleur): # en haut
+            nbVoisin += self.parcoursProfondeurNbVoisin(x, y-1)
+                
+        if(x<self.tailleX-1 and self.l_map[y][x+1]==couleur): # à droite
+            nbVoisin += self.parcoursProfondeurNbVoisin(x+1, y)
+                
+        if(y<self.tailleY-1 and self.l_map[y+1][x]==couleur): # en bas
+            nbVoisin += self.parcoursProfondeurNbVoisin(x, y+1)
+                
+        if(x>0 and self.l_map[y][x-1]==couleur): # à gauche
+            nbVoisin += self.parcoursProfondeurNbVoisin(x-1, y)
+
+        return nbVoisin
+    
+    
+    def supprime(self,x,y):
+        if(self.estSupprimable(x,y)):
+            self.parcoursProfondeurSupprime(x,y)
+    
+    def parcoursProfondeurSupprime(self,x,y):
+        couleur = self.l_map[y][x]
+        self.l_map[y][x] = 0
+        
+        if(y>0 and self.l_map[y-1][x]==couleur): # en haut
+            self.parcoursProfondeurSupprime(x, y-1)
+                
+        if(x<self.tailleX-1 and self.l_map[y][x+1]==couleur): # à droite
+            self.parcoursProfondeurSupprime(x+1, y)
+                
+        if(y<self.tailleY-1 and self.l_map[y+1][x]==couleur): # en bas
+            self.parcoursProfondeurSupprime(x, y+1)
+                
+        if(x>0 and self.l_map[y][x-1]==couleur): # à gauche
+            self.parcoursProfondeurSupprime(x-1, y)
