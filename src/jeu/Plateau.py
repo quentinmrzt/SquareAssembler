@@ -6,14 +6,14 @@ class Plateau:
     - son tableau 2D contenant une référence vers une couleur
     - une liste des couleurs"""
 
-    
-    def __init__(self): # Notre méthode constructeur
-        self.tailleX = 20
-        self.tailleY = 20
-        self.nbCouleur = 8 
+    def __init__(self, x=20,y=20): # Notre méthode constructeur
+        self.tailleX = x
+        self.tailleY = y
+        self.nbCouleur = int(x/2.5)
         self.listeCouleur = ["white","red","blue","yellow","green","cyan","magenta","violet","orange"]
         
         self.aleatoire()
+
                         
     def aleatoire(self):
         nbParCouleur = [int((self.tailleX*self.tailleY)/self.nbCouleur)] * self.nbCouleur
@@ -133,7 +133,6 @@ class Plateau:
                     i = i-1
     
                 if(ligneVide):
-                    print("Ligne vide en ",x)
                     decalage = decalage + 1
             x = x+1
             
