@@ -13,6 +13,10 @@ def cliqueGauche(event):
         score += plateau.supprime(x,y)
         plateau.gravite()
         plateau.decalage()
+        
+        
+        if (not plateau.estJouable()):
+            plateau = None
         maj()
             
 def cliqueDroit(event):
@@ -31,20 +35,22 @@ def maj():
     global canvasPlateau, canvasScore, tailleCarre
     
     canvasPlateau.delete("all")
-    tailleCarre = 600/plateau.tailleX
-
-    x = 0
-    while x<plateau.tailleX:
-        y = 0
-        while y<plateau.tailleY: 
-            image = canvasPlateau.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=plateau.getCouleur(x,y))
-            y = y+1
-        x = x+1
-    canvasPlateau.grid(row=0,column=0,padx=0)
     
-    canvasScore.delete("all")
-    canvasScore.create_text(50,50,text="Score = "+str(score))
-    canvasScore.grid(row=0,column=1)
+    if(plateau!=None):
+        tailleCarre = 600/plateau.tailleX
+    
+        x = 0
+        while x<plateau.tailleX:
+            y = 0
+            while y<plateau.tailleY: 
+                image = canvasPlateau.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=plateau.getCouleur(x,y))
+                y = y+1
+            x = x+1
+        canvasPlateau.grid(row=0,column=0,padx=0)
+        
+        canvasScore.delete("all")
+        canvasScore.create_text(50,50,text="Score = "+str(score))
+        canvasScore.grid(row=0,column=1)
 
 def aPropos():
     showinfo("Numéro d'anonymat", "Quentin Morizot")    
@@ -56,9 +62,9 @@ def nouveau():
     win.geometry('300x100+300+300')
     win.title("Changement de plateau")
     message = "Choisissez la taille du plateau:"
-    Label(win, text=message).grid(row=0,column=0,columnspan=2)
-    Button(win,text='10x10', command=nouveau10x10).grid(row=1,column=0,padx=0)
-    Button(win,text='20x20', command=nouveau20x20).grid(row=1,column=1,padx=0)
+    Label(win, text=message, width=41, height=2).grid(row=0,column=0,columnspan=2)
+    Button(win,text='10x10', width=10, height=3,command=nouveau10x10).grid(row=1,column=0,padx=0)
+    Button(win,text='20x20', width=10, height=3, command=nouveau20x20).grid(row=1,column=1,padx=0)
     
 def nouveau10x10():
     global plateau, score, win

@@ -142,3 +142,16 @@ class Plateau:
                     decalage = decalage + 1
             x = x+1
             
+    def estJouable(self):
+        x = 0
+        jouable = False
+
+        while (not jouable and x<self.tailleX):
+            y = 0
+            while (not jouable and y<self.tailleY):
+                if(self.nbSupprimable(x,y)!=0):
+                    jouable = True
+                y = y+1
+            x = x+1
+            
+        return jouable
