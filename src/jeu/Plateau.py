@@ -32,7 +32,7 @@ class Plateau:
                         trouve = True
                 y = y+1
             x = x+1
-                        
+
     def getCouleur(self, x, y):
         return self.listeCouleur[self.l_map[y][x]]
     

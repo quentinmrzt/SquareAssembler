@@ -9,63 +9,82 @@ from src.jeu import Modele
 class Fenetre:
     def __init__(self,modele):
         self.modele = modele
-        
+        self.tailleEcranX = 604
+        self.tailleEcranY = 700
         self.root = Tk()
         self.root.resizable(width=False,height=False)
         self.root.title("Square Assembler")
-        self.root.geometry('604x660+200+200')
+        self.root.geometry(str(self.tailleEcranX)+'x'+str(self.tailleEcranY)+'+200+200')
         
         self.win = None
         
         # Menu
         menubar = Menu(self.root)
-        
         # Menu Jeu et ses sous menu
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="Nouveau", command=self.fenetreChoix)
         filemenu.add_separator()
         filemenu.add_command(label="Quitter", command=self.root.quit)
-        
         menubar.add_cascade(label="Jeu", menu=filemenu)
         # Menu "A propos" et son sous menu
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="Numéro d'anonymat", command=self.aPropos)
         menubar.add_cascade(label="A propos", menu=editmenu)
+        # affichage du menu
+        self.root.config(menu=menubar)
         
         # Affichage de la map
-        self.canvasPlateau = Canvas(self.root, width=600, height=600, borderwidth=0)
+        self.taillePlateauX = 600
+        self.taillePlateauY = 600
+        self.canvasPlateau = Canvas(self.root, width=self.taillePlateauX, height=self.taillePlateauY, borderwidth=0)
         self.canvasPlateau.bind('<Button-1>', self.cliqueGauche)
         self.canvasPlateau.bind('<Button-2>', self.cliqueMolette)
         self.canvasPlateau.bind('<Button-3>', self.cliqueDroit)
         
-        self.canvasPlateau.grid(row=1,column=0,padx=0)
-        
         # Affichage du score
-        self.canvasScore = Canvas(self.root, width=600, height=50, borderwidth=0)
-        self.canvasScore.grid(row=0,column=0,padx=0)
+        self.tailleScoreX = 600
+        self.tailleScoreY = 70
+        self.canvasScore = Canvas(self.root, width=self.tailleScoreX, height=self.tailleScoreY, borderwidth=0, bg=None)
         
-        police = tkFont.Font(family='Impact', size=15)
-        self.canvasScore.create_text(300,15,text="SQUARE",font=police)
-        self.canvasScore.create_text(300,35,text="ASSEMBLER",font=police)
-        
-        self.canvasScore.create_text(100,15,text="1UP",font=police)
-        self.canvasScore.create_text(100,35,text="000/000",font=police)
-        self.canvasScore.create_text(500,15,text="2UP",font=police)
-        self.canvasScore.create_text(500,35,text="000/000",font=police)
-        
-        self.canvasScore.create_line(0, 50, 600, 50,width=2)
-        
-        # affichage du menu
-        self.root.config(menu=menubar)
+        self.maj()
         
         self.root.mainloop()
         
-    def maj(self):        
-        self.canvasPlateau.delete("all")
+    def maj(self):                
+        self.canvasScore.delete("all")
         
+        # Titre
+        police = tkFont.Font(family='Impact', size=15)
+        self.canvasScore.create_text(self.tailleScoreX/2,15,text="SQUARE",font=police)
+        self.canvasScore.create_text(self.tailleScoreX/2,35,text="ASSEMBLER",font=police)
+        
+        # Affichages des joueurs
+        if(self.modele.nbJoueur>=1):
+            color="black"
+        else:
+            color="grey"
+        
+        self.canvasScore.create_text(100,15,text="1UP",font=police,fill=color)
+        self.canvasScore.create_text(100,35,text=self.strScore(1),font=police,fill=color)
+            
+        if(self.modele.nbJoueur>=2):
+            color="black"
+        else:
+            color="grey"
+            
+        self.canvasScore.create_text(self.tailleScoreX-100,15,text="2UP",font=police,fill=color)
+        self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2),font=police,fill=color)
+        
+        # Ligne de séparation
+        self.canvasScore.create_line(0, 50, self.tailleScoreX, 50, width=2)
+        
+        # Affichage si le jeu est en cours
         if(self.modele.existePlateau()):
-            tailleCarre = 600/self.modele.tailleX
+            self.canvasPlateau.delete("all")
+            
+            tailleCarre = self.tailleScoreX/self.modele.tailleX
         
+            # Affichage du plateau
             x = 0
             while x<self.modele.tailleX:
                 y = 0
@@ -73,41 +92,62 @@ class Fenetre:
                     self.canvasPlateau.create_rectangle(x*tailleCarre,y*tailleCarre,x*tailleCarre+tailleCarre,y*tailleCarre+tailleCarre,fill=self.modele.plateau.getCouleur(x,y))
                     y = y+1
                 x = x+1
-            self.canvasPlateau.grid(row=1,column=0,padx=0)
             
-            police = tkFont.Font(family='Impact', size=15)
+            # Affichage des carrés de couleurs
+            tailleCarre = 14
+            y = 54
             
-            self.canvasScore.delete("all")
-            self.canvasScore.create_text(100,15,text="1UP",font=police)
-            self.canvasScore.create_text(100,35,text=self.strScore(1),font=police)
+            x = 100-(len(self.modele.listeCouleurJ1)*tailleCarre)/2
+            i = 0
+            while (i<len(self.modele.listeCouleurJ1)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ1[i])
+                i = i+1
             
-            self.canvasScore.create_text(500,15,text="2UP",font=police)
-            self.canvasScore.create_text(500,35,text=self.strScore(2),font=police)
+            x = (self.tailleScoreX-100)-(len(self.modele.listeCouleurJ2*tailleCarre))/2
+            i = 0
+            while (i<len(self.modele.listeCouleurJ2)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ2[i])
+                i = i+1
             
-            self.canvasScore.create_text(300,15,text="SQUARE",font=police)
-            self.canvasScore.create_text(300,35,text="ASSEMBLER",font=police)
-            self.canvasScore.create_line(0, 50, 600, 50,width=2)
-
-            self.canvasScore.grid(row=0,column=0)
-            
+            x = (self.tailleScoreX/2)-(len(self.modele.listeCouleurRestante)*tailleCarre)/2
+            i = 0
+            while (i<len(self.modele.listeCouleurRestante)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurRestante[i])
+                i = i+1
+        
+        # Affichage fin de jeu
+        if(not self.modele.enJeu):
+            if(self.modele.nbJoueur==1):
+                police = tkFont.Font(family='Impact', size=30)
+                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2,text="FIN DU JEU",font=police)
+                
+            if(self.modele.nbJoueur==2):
+                print("FIN: deux joueur")
+        
+        self.canvasScore.grid(row=0,column=0)
+        self.canvasPlateau.grid(row=1,column=0,padx=0)
+        
     def strScore(self,joueur):
         tailleMax = 3
         if(joueur==1):
             score = str(self.modele.scoreJ1)
         else:
             score = str(self.modele.scoreJ2)
+        
         taille = len(score)
-            
         while(tailleMax-taille>0):
             score = "0"+score
             taille = len(score)
             
-        score +="/"+str(self.modele.nbCase())
-            
+        if(self.modele.nbJoueur<joueur):
+            score += "/000"
+        else:
+            score +="/"+str(self.modele.nbCase())
+        
         return score
     
     def aPropos(self):
-        showinfo("Numéro d'anonymat", "Quentin Morizot")    
+        showinfo("Numéro d'anonymat", "Quentin Morizot / Rémi Pierron")    
     
     def fenetreChoix(self):
         self.win = Toplevel(self.root)
@@ -140,8 +180,7 @@ class Fenetre:
             self.win.destroy()
         
     def cliqueGauche(self,event): 
-        if(self.modele.existePlateau()):
-
+        if(self.modele.enJeu):
             tailleCarre = 600/self.modele.tailleX
             
             x = (int)(event.x/tailleCarre)
@@ -165,8 +204,7 @@ class Fenetre:
             self.maj()
             
     def cliqueDroit(self,event):
-        if(self.modele.existePlateau()):
-
+        if(self.modele.enJeu):
             tailleCarre = 600/self.modele.tailleX
             
             x = (int)(event.x/tailleCarre)
