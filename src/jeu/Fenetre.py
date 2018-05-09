@@ -10,7 +10,7 @@ class Fenetre:
     def __init__(self,modele):
         self.modele = modele
         self.tailleEcranX = 604
-        self.tailleEcranY = 700
+        self.tailleEcranY = 720
         self.root = Tk()
         self.root.resizable(width=False,height=False)
         self.root.title("Square Assembler")
@@ -38,13 +38,14 @@ class Fenetre:
         self.taillePlateauY = 600
         self.canvasPlateau = Canvas(self.root, width=self.taillePlateauX, height=self.taillePlateauY, borderwidth=0)
         self.canvasPlateau.bind('<Button-1>', self.cliqueGauche)
-        self.canvasPlateau.bind('<Button-2>', self.cliqueMolette)
-        self.canvasPlateau.bind('<Button-3>', self.cliqueDroit)
         
         # Affichage du score
         self.tailleScoreX = 600
         self.tailleScoreY = 70
         self.canvasScore = Canvas(self.root, width=self.tailleScoreX, height=self.tailleScoreY, borderwidth=0, bg=None)
+        
+        # Bouton passer
+        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='red', font=tkFont.Font(family='Impact', size=12))
         
         self.maj()
         
@@ -116,8 +117,6 @@ class Fenetre:
                 i = i+1
         
         # Affichage fin de jeu
-        
-
         if(not self.modele.enJeu and self.modele.nbJoueur!=0):
             police = tkFont.Font(family='Impact', size=30)
             self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2-20,text="FIN DU JEU",font=police)
@@ -135,9 +134,25 @@ class Fenetre:
                         self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="EGALITE",font=police)
                 
         
-        self.canvasScore.grid(row=0,column=0)
-        self.canvasPlateau.grid(row=1,column=0,padx=0)
+        # Gestion bouton passer
+        if(self.modele.nbJoueur!=0):
+            if (self.modele.nbJoueur==1):
+                self.boutonPasser.config(state="disabled")
+            else:
+                self.boutonPasser.config(state="normal")
+            
+            self.boutonPasser.grid(row=3,column=2,sticky='e',padx=4)
         
+        self.canvasScore.grid(row=0,column=0,columnspan=3)
+        self.canvasPlateau.grid(row=1,column=0,padx=0,columnspan=3)
+    
+    def passerTour(self):
+        if(self.modele.nbJoueur==2):
+            if(self.modele.tourDeJeu == 1):
+                self.modele.tourDeJeu = 2
+            else:
+                self.modele.tourDeJeu = 1
+    
     def strScore(self,joueur):
         tailleMax = 3
         if(joueur==1):
@@ -164,6 +179,7 @@ class Fenetre:
         self.win = Toplevel(self.root)
         self.win.geometry('300x260+300+300')
         self.win.title("Changement de plateau")
+        self.win.resizable(width=False,height=False)
         
         Label(self.win, text="Choisissez la taille du plateau:", width=41, height=2).grid(row=0,column=0,columnspan=2)
         varTaille = IntVar()
@@ -198,30 +214,11 @@ class Fenetre:
             y = (int)(event.y/tailleCarre)
         
             if(x>=0 and x<self.modele.tailleX and y>=0 and y<self.modele.tailleY):
-                self.modele.supprimerCase(x,y)
-            
-            self.maj()
+                self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
+                self.maj()
                 
-    """ Fonction pour tester: à supprimer """
-    def cliqueMolette(self,event):
-        if(self.modele.existePlateau()):
-            tailleCarre = 600/self.modele.tailleX
-            
-            x = (int)(event.x/tailleCarre)
-            y = (int)(event.y/tailleCarre)
-        
-            self.modele.plateau.l_map[y][x]=0
-            self.modele.plateau.gravite()
-            self.modele.plateau.decalage()
-            self.maj()
-            
-    def cliqueDroit(self,event):
-        if(self.modele.enJeu):
-            tailleCarre = 600/self.modele.tailleX
-            
-            x = (int)(event.x/tailleCarre)
-            y = (int)(event.y/tailleCarre)
-        
-            self.modele.supprimerCase(x,y,2)
-            
-            self.maj()
+                if(self.modele.nbJoueur==2):
+                    if(self.modele.tourDeJeu == 1):
+                        self.modele.tourDeJeu = 2
+                    else:
+                        self.modele.tourDeJeu = 1

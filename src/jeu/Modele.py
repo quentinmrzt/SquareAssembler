@@ -16,6 +16,8 @@ class Modele:
         self.plateau = None
         self.tailleX = 0
         self.tailleY = 0
+        
+        self.tourDeJeu = None
 
     def existePlateau(self):
         return (self.plateau!=None)
@@ -79,6 +81,7 @@ class Modele:
         self.plateau = Plateau.Plateau(x,y)
         self.scoreJ1 = 0
         self.scoreJ2 = 0
+        self.tourDeJeu = 1
         
         self.listeCouleurJ1.clear()
         self.listeCouleurJ2.clear()
