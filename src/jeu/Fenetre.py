@@ -5,6 +5,7 @@ import tkinter.font as tkFont
 from tkinter.messagebox import showinfo
 from src.jeu import Plateau
 from src.jeu import Modele
+import time
 
 class Fenetre:
     def __init__(self,modele):
@@ -17,7 +18,7 @@ class Fenetre:
         self.root.geometry(str(self.tailleEcranX)+'x'+str(self.tailleEcranY)+'+200+200')
         
         self.win = None
-        
+                
         # Menu
         menubar = Menu(self.root)
         # Menu Jeu et ses sous menu
@@ -45,8 +46,16 @@ class Fenetre:
         self.canvasScore = Canvas(self.root, width=self.tailleScoreX, height=self.tailleScoreY, borderwidth=0, bg=None)
         
         # Bouton passer
-        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='grey', font=tkFont.Font(family='Impact', size=12))
-                
+        police = tkFont.Font(family='Impact', size=12)
+        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='grey', font=police)
+        
+        # Le temps 
+        self.label = Label(self.root, text="", font=police)
+        self.label.grid(row=3,column=1)
+        
+        self.dureeTour = -1
+        self.temps = -1
+        
         self.maj()
         
         self.root.mainloop()
@@ -175,17 +184,27 @@ class Fenetre:
                 self.boutonPasser.config(state="normal")
             
             self.boutonPasser.grid(row=3,column=2,sticky='e',padx=4)
-        
+            
         self.canvasScore.grid(row=0,column=0,columnspan=3)
         self.canvasPlateau.grid(row=1,column=0,padx=0,columnspan=3)
     
-    def passerTour(self):
-        if(self.modele.nbJoueur==2 and self.modele.enJeu):
-            if(self.modele.tourDeJeu == 1):
-                self.modele.tourDeJeu = 2
-            else:
-                self.modele.tourDeJeu = 1
+    def update_clock(self):
+        if(self.modele.enJeu and self.modele.nbJoueur==2):
+            self.temps = self.temps-1
                 
+            if(self.temps<=0):
+                self.temps = self.dureeTour
+                self.modele.passerTour()
+                self.maj()
+            self.label.configure(text=self.temps)
+        else:
+            self.label.configure(text=self.temps,fg="grey")
+            
+        self.root.after(1000, self.update_clock)
+    
+    def passerTour(self):
+        self.modele.passerTour()
+        self.temps = self.dureeTour+1 # on rajoute 1 à cause de la latence d'affichage
         self.maj()
     
     def strScore(self,joueur):
@@ -238,6 +257,11 @@ class Fenetre:
     def nouveau(self,taille,joueur):
         if (taille!=0 and joueur!=0):
             self.modele.nouveauPlateau(taille,taille,joueur)
+            
+            if(joueur==2):
+                self.dureeTour = 10
+                self.update_clock()
+            
             self.maj()
             self.win.destroy()
         

@@ -22,8 +22,6 @@ class Modele:
     def existePlateau(self):
         return (self.plateau!=None)
     
-    
-    
     def estMaCouleur(self,couleur,joueur=1):
         if(joueur==1):
             return couleur in self.listeCouleurJ1 or (couleur in self.listeCouleurRestante and len(self.listeCouleurJ1)<self.plateau.nbCouleur/2)
@@ -82,9 +80,26 @@ class Modele:
                 self.enJeu = False
             
             return caseSupprime
-            
-    def nouveauPlateau(self,x,y,nb):
+    
+    def changementJoueur(self):
+        if(self.tourDeJeu == 1):
+            self.tourDeJeu = 2
+        else:
+            self.tourDeJeu = 1
+                
+    def passerTour(self):
+        if(self.nbJoueur==2 and self.enJeu):
+            self.changementJoueur()
+    
+    def nouveauPlateau(self,x,y,nb,duree=10):
         self.nbJoueur = nb
+        
+        if(self.nbJoueur==1):
+            self.temps = -1
+        else:
+            self.dureeTour = duree
+            self.temps = self.dureeTour
+
         self.enJeu = True
         
         self.tailleX = x
@@ -93,7 +108,7 @@ class Modele:
         self.scoreJ1 = 0
         self.scoreJ2 = 0
         self.tourDeJeu = 1
-        
+                
         self.listeCouleurJ1.clear()
         self.listeCouleurJ2.clear()
         self.listeCouleurRestante.clear()
