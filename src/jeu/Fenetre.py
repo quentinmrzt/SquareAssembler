@@ -45,8 +45,8 @@ class Fenetre:
         self.canvasScore = Canvas(self.root, width=self.tailleScoreX, height=self.tailleScoreY, borderwidth=0, bg=None)
         
         # Bouton passer
-        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='red', font=tkFont.Font(family='Impact', size=12))
-        
+        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='grey', font=tkFont.Font(family='Impact', size=12))
+                
         self.maj()
         
         self.root.mainloop()
@@ -77,7 +77,40 @@ class Fenetre:
         self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2),font=police,fill=color)
         
         # Ligne de séparation
-        self.canvasScore.create_line(0, 50, self.tailleScoreX, 50, width=2)
+        #self.canvasScore.create_line(0, 50, self.tailleScoreX, 50, width=2)
+        
+        # Ligne de séparation
+        self.canvasScore.create_line(0, 45, 50, 45, width=2) # ---
+        
+        if(self.modele.tourDeJeu==1):
+            self.canvasScore.create_line(50, 5, 50, 50, width=2) # |
+            self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+            self.canvasScore.create_line(50, 5 , 150, 5, width=2) # ---
+            self.canvasScore.create_line(150, 50, 150, 5, width=2) # |
+        else:
+            self.canvasScore.create_line(50, 45, 50, 50, width=2) # |
+            self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+            self.canvasScore.create_line(150, 50, 150, 45, width=2) # |
+        
+        self.canvasScore.create_line(150, 45 , (self.tailleScoreX/2)-60, 45, width=2) # ---
+        
+        self.canvasScore.create_line((self.tailleScoreX/2)-60, 45, (self.tailleScoreX/2)-60, 50, width=2) # |
+        self.canvasScore.create_line((self.tailleScoreX/2)-60, 50 , (self.tailleScoreX/2)+60, 50, width=2) # ---
+        self.canvasScore.create_line((self.tailleScoreX/2)+60, 50, (self.tailleScoreX/2)+60, 45, width=2) # |
+        
+        self.canvasScore.create_line((self.tailleScoreX/2)+60, 45 , self.tailleScoreX-150, 45, width=2) # ---
+        
+        if(self.modele.tourDeJeu==2):
+            self.canvasScore.create_line(self.tailleScoreX-150, 5 , self.tailleScoreX-150, 50, width=2) # |
+            self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+            self.canvasScore.create_line(self.tailleScoreX-150, 5, self.tailleScoreX-50, 5, width=2) # ---
+            self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 5, width=2) # |
+        else:
+            self.canvasScore.create_line(self.tailleScoreX-150, 45 , self.tailleScoreX-150, 50, width=2) # |
+            self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+            self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 45, width=2) # |
+        
+        self.canvasScore.create_line(self.tailleScoreX-50, 45 ,self.tailleScoreX, 45, width=2) # ---
         
         # Affichage si le jeu est en cours
         if(self.modele.existePlateau()):
@@ -147,11 +180,13 @@ class Fenetre:
         self.canvasPlateau.grid(row=1,column=0,padx=0,columnspan=3)
     
     def passerTour(self):
-        if(self.modele.nbJoueur==2):
+        if(self.modele.nbJoueur==2 and self.modele.enJeu):
             if(self.modele.tourDeJeu == 1):
                 self.modele.tourDeJeu = 2
             else:
                 self.modele.tourDeJeu = 1
+                
+        self.maj()
     
     def strScore(self,joueur):
         tailleMax = 3
@@ -214,11 +249,12 @@ class Fenetre:
             y = (int)(event.y/tailleCarre)
         
             if(x>=0 and x<self.modele.tailleX and y>=0 and y<self.modele.tailleY):
-                self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
-                self.maj()
+                passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
                 
-                if(self.modele.nbJoueur==2):
+                if(self.modele.nbJoueur==2 and passerLeTour):
                     if(self.modele.tourDeJeu == 1):
                         self.modele.tourDeJeu = 2
                     else:
                         self.modele.tourDeJeu = 1
+                        
+                self.maj()

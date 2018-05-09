@@ -45,32 +45,43 @@ class Modele:
     
     def supprimerCase(self,x,y,joueur=1):
         couleur = self.plateau.getCouleur(x,y)
-    
-        if(joueur==1):
-            if(self.nbJoueur==1):
-                self.scoreJ1 += self.plateau.supprime(x,y)
-            else:
-                # 2 joueurs, donc on prend en compte la couleur
-                if(self.estMaCouleur(couleur,1)):
+        if(couleur=="white"):
+            return False
+        else:
+            caseSupprime = False
+            
+            if(joueur==1):
+                if(self.nbJoueur==1):
                     scoreTmp = self.plateau.supprime(x,y)
-    
                     if(scoreTmp!=0):
                         self.scoreJ1 += scoreTmp
-                        self.ajouterCouleurJ1(couleur)
-        else:
-            if(joueur==2 and self.nbJoueur>=2):
-                if(self.estMaCouleur(couleur,2)):                   
-                    scoreTmp = self.plateau.supprime(x,y)
-    
-                    if(scoreTmp!=0):
-                        self.scoreJ2 += scoreTmp
-                        self.ajouterCouleurJ2(couleur)
+                        caseSupprime = True
+                else:
+                    # 2 joueurs, donc on prend en compte la couleur
+                    if(self.estMaCouleur(couleur,1)):
+                        scoreTmp = self.plateau.supprime(x,y)
         
-        self.plateau.gravite()
-        self.plateau.decalage()
+                        if(scoreTmp!=0):
+                            self.scoreJ1 += scoreTmp
+                            self.ajouterCouleurJ1(couleur)
+                            caseSupprime = True
+            else:
+                if(joueur==2 and self.nbJoueur==2):
+                    if(self.estMaCouleur(couleur,2)):                   
+                        scoreTmp = self.plateau.supprime(x,y)
+        
+                        if(scoreTmp!=0):
+                            self.scoreJ2 += scoreTmp
+                            self.ajouterCouleurJ2(couleur)
+                            caseSupprime = True
             
-        if (not self.plateau.estJouable()):
-            self.enJeu = False
+            self.plateau.gravite()
+            self.plateau.decalage()
+                
+            if (not self.plateau.estJouable()):
+                self.enJeu = False
+            
+            return caseSupprime
             
     def nouveauPlateau(self,x,y,nb):
         self.nbJoueur = nb
