@@ -116,13 +116,24 @@ class Fenetre:
                 i = i+1
         
         # Affichage fin de jeu
-        if(not self.modele.enJeu):
+        
+
+        if(not self.modele.enJeu and self.modele.nbJoueur!=0):
+            police = tkFont.Font(family='Impact', size=30)
+            self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2-20,text="FIN DU JEU",font=police)
+            
             if(self.modele.nbJoueur==1):
-                police = tkFont.Font(family='Impact', size=30)
-                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2,text="FIN DU JEU",font=police)
-                
+                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="SCORE FINAL: "+str(self.modele.scoreJ1),font=police)
+            
             if(self.modele.nbJoueur==2):
-                print("FIN: deux joueur")
+                if(self.modele.scoreJ1>self.modele.scoreJ2):
+                    self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 1",font=police)
+                else:
+                    if(self.modele.scoreJ2>self.modele.scoreJ1):
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 2",font=police)
+                    else:
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="EGALITE",font=police)
+                
         
         self.canvasScore.grid(row=0,column=0)
         self.canvasPlateau.grid(row=1,column=0,padx=0)
@@ -180,13 +191,14 @@ class Fenetre:
             self.win.destroy()
         
     def cliqueGauche(self,event): 
-        if(self.modele.enJeu):
+        if(self.modele.enJeu and self.modele.existePlateau()):
             tailleCarre = 600/self.modele.tailleX
             
             x = (int)(event.x/tailleCarre)
             y = (int)(event.y/tailleCarre)
         
-            self.modele.supprimerCase(x,y)
+            if(x>=0 and x<self.modele.tailleX and y>=0 and y<self.modele.tailleY):
+                self.modele.supprimerCase(x,y)
             
             self.maj()
                 

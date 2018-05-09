@@ -34,7 +34,8 @@ class Plateau:
             x = x+1
 
     def getCouleur(self, x, y):
-        return self.listeCouleur[self.l_map[y][x]]
+        if(x>=0 and x<self.tailleX and y>=0 and y<self.tailleY):
+            return self.listeCouleur[self.l_map[y][x]]
     
     def marquage(self,x,y):
         self.l_map[y][x] = -self.l_map[y][x]
