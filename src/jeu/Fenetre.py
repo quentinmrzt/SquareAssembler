@@ -293,5 +293,6 @@ class Fenetre:
                 
                 if(self.modele.nbJoueur==2 and passerLeTour):
                     self.changementTour()
+                    
                         
                 self.maj()

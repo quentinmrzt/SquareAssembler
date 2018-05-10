@@ -91,8 +91,13 @@ class Modele:
                 
     def passerTour(self):
         if(self.nbJoueur==2 and self.enJeu):
-            self.changementJoueur()
-
+            if(self.tourDeJeu==1):
+                if(self.plateau.estJouableTest(self.listeCouleurJ2+self.listeCouleurRestante)):
+                    self.changementJoueur()
+            else:
+                if(self.plateau.estJouableTest(self.listeCouleurJ1+self.listeCouleurRestante)):
+                    self.changementJoueur()
+                    
     def nouveauPlateau(self,x,y,nb):
         self.enJeu = True
         self.nombrePartie += 1

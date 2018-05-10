@@ -142,7 +142,22 @@ class Plateau:
                 if(ligneVide):
                     decalage = decalage + 1
             x = x+1
+    
+    def estJouableTest(self,listeCouleur):
+        x = 0
+        jouable = False
+
+        while (not jouable and x<self.tailleX):
+            y = 0
+            while (not jouable and y<self.tailleY):
+                
+                if((self.getCouleur(x,y) in listeCouleur) and self.nbSupprimable(x,y)!=0):
+                    jouable = True
+                y = y+1
+            x = x+1
             
+        return jouable
+     
     def estJouable(self):
         x = 0
         jouable = False
