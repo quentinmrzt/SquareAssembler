@@ -1,4 +1,4 @@
-from tkinter import Tk, Menu, Canvas, Label, Toplevel, Button, Radiobutton, IntVar
+from tkinter import Tk, Menu, Canvas, Label, Toplevel, Button, Radiobutton, IntVar, StringVar, Entry
 
 
 import tkinter.font as tkFont
@@ -17,6 +17,7 @@ class Fenetre:
         self.root.geometry(str(self.tailleEcranX)+'x'+str(self.tailleEcranY)+'+200+200')
         
         self.win = None
+        self.winDuree = None
                 
         # Menu
         menubar = Menu(self.root)
@@ -271,14 +272,44 @@ class Fenetre:
 
         Button(self.win,text='VALIDER',command=lambda:self.nouveau(varTaille.get(),varJoueur.get())).grid(row=5,column=0)
         Button(self.win,text='ANNULER',command=self.win.destroy).grid(row=5,column=1)
-    
+        
+    def fenetreDuree(self,varTaille,joueur):
+        self.winDuree = Toplevel(self.root)
+        self.winDuree.geometry('200x100+300+300')
+        self.winDuree.title("Durée")
+        self.winDuree.resizable(width=False,height=False)
+        
+        Label(self.winDuree, text="Choisissez la durée d'un tour:").grid(row=0,column=0,columnspan=2)
+        
+        value = IntVar()
+        value.set(10)
+        entree = Entry(self.winDuree, textvariable=value, width=30)
+        entree.grid(row=1,column=0,columnspan=2,padx=7)
+        
+        Label(self.winDuree, text="").grid(row=2,column=0,columnspan=2)
+        
+        Button(self.winDuree,text='VALIDER',command=lambda:self.nouveau2Joueurs(varTaille,value)).grid(row=3,column=0,pady=5)
+        Button(self.winDuree,text='ANNULER',command=self.winDuree.destroy).grid(row=3,column=1,pady=5)
+                
+    def nouveau2Joueurs(self,taille,duree):
+        
+        try:
+            duree.get()
+            self.modele.nouveauPlateau(taille,taille,2)
+            self.lancer_horloge(duree.get())
+            self.maj()
+            self.winDuree.destroy()
+        except :
+            Label(self.winDuree, text="Erreur: Il faut un entier !",fg="red").grid(row=2,column=0,columnspan=2)
+            
     def nouveau(self,taille,joueur):
         if (taille!=0 and joueur!=0):
-            self.modele.nouveauPlateau(taille,taille,joueur)
+            if (joueur==1):
+                self.modele.nouveauPlateau(taille,taille,joueur)
+                self.maj()
+            else:
+                self.fenetreDuree(taille,joueur)
             
-            self.lancer_horloge(10)
-            
-            self.maj()
             self.win.destroy()
         
     def cliqueGauche(self,event): 
