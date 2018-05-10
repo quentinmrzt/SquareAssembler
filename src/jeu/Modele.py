@@ -9,10 +9,12 @@ class Modele:
         
         self.listeCouleurRestante = []
         
+        self.nombrePartie = 0
+                
         self.nbJoueur = nbJoueur
         
         self.enJeu = False
-        
+                
         self.plateau = None
         self.tailleX = 0
         self.tailleY = 0
@@ -90,18 +92,12 @@ class Modele:
     def passerTour(self):
         if(self.nbJoueur==2 and self.enJeu):
             self.changementJoueur()
-    
-    def nouveauPlateau(self,x,y,nb,duree=10):
-        self.nbJoueur = nb
-        
-        if(self.nbJoueur==1):
-            self.temps = -1
-        else:
-            self.dureeTour = duree
-            self.temps = self.dureeTour
 
+    def nouveauPlateau(self,x,y,nb):
         self.enJeu = True
-        
+        self.nombrePartie += 1
+        self.nbJoueur = nb
+
         self.tailleX = x
         self.tailleY = y
         self.plateau = Plateau.Plateau(x,y)

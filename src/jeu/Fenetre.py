@@ -5,7 +5,6 @@ import tkinter.font as tkFont
 from tkinter.messagebox import showinfo
 from src.jeu import Plateau
 from src.jeu import Modele
-import time
 
 class Fenetre:
     def __init__(self,modele):
@@ -47,7 +46,7 @@ class Fenetre:
         
         # Bouton passer
         police = tkFont.Font(family='Impact', size=12)
-        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.passerTour, disabledforeground ='grey', font=police)
+        self.boutonPasser = Button(self.root, state ='disabled', text='>> PASSER SON TOUR >>',command=self.changementTour, disabledforeground ='grey', font=police)
         
         # Le temps 
         self.label = Label(self.root, text="", font=police)
@@ -188,24 +187,43 @@ class Fenetre:
         self.canvasScore.grid(row=0,column=0,columnspan=3)
         self.canvasPlateau.grid(row=1,column=0,padx=0,columnspan=3)
     
-    def update_clock(self):
-        if(self.modele.enJeu and self.modele.nbJoueur==2):
-            self.temps = self.temps-1
-                
-            if(self.temps<=0):
-                self.temps = self.dureeTour
-                self.modele.passerTour()
-                self.maj()
-            self.label.configure(text=self.temps)
-        else:
-            self.label.configure(text=self.temps,fg="grey")
-            
-        self.root.after(1000, self.update_clock)
-    
-    def passerTour(self):
+    def changementTour(self):
         self.modele.passerTour()
-        self.temps = self.dureeTour+1 # on rajoute 1 à cause de la latence d'affichage
-        self.maj()
+        
+        self.temps = self.dureeTour
+        
+        self.majHorloge() # pour afficher le nouveau temps
+        self.maj() # pour afficher le joueur
+        
+    def majHorloge(self):
+        if(self.modele.enJeu and self.modele.nbJoueur==2):
+            self.label.configure(text=self.strEntier(self.temps,len(str(self.dureeTour))), fg="black")
+        else:
+            self.label.configure(text="0",fg="grey")
+    
+    def lancer_horloge(self,duree):
+        self.horlogePartie = self.modele.nombrePartie
+        self.dureeTour = duree
+        self.temps = duree
+        self.tick_horloge(self.modele.nombrePartie)
+        
+    def tick_horloge(self,partie):
+        self.temps -= 1
+                
+        if(self.temps<=0):
+            self.changementTour()
+        else:
+            self.majHorloge()
+                    
+        if(self.modele.enJeu and self.modele.nbJoueur==2 and partie==self.horlogePartie):
+            self.root.after(1000, lambda:self.tick_horloge(partie))
+    
+    def strEntier(self,nombre,taille):
+        tmp = str(nombre)
+        while (len(tmp)<taille):
+            tmp = "0"+tmp
+            
+        return tmp
     
     def strScore(self,joueur):
         tailleMax = 3
@@ -258,9 +276,7 @@ class Fenetre:
         if (taille!=0 and joueur!=0):
             self.modele.nouveauPlateau(taille,taille,joueur)
             
-            if(joueur==2):
-                self.dureeTour = 10
-                self.update_clock()
+            self.lancer_horloge(10)
             
             self.maj()
             self.win.destroy()
@@ -276,9 +292,6 @@ class Fenetre:
                 passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
                 
                 if(self.modele.nbJoueur==2 and passerLeTour):
-                    if(self.modele.tourDeJeu == 1):
-                        self.modele.tourDeJeu = 2
-                    else:
-                        self.modele.tourDeJeu = 1
+                    self.changementTour()
                         
                 self.maj()
