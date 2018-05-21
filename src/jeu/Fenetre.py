@@ -1,10 +1,11 @@
 from tkinter import Tk, Menu, Canvas, Label, Toplevel, Button, Radiobutton, IntVar, StringVar, Entry
 
-
 import tkinter.font as tkFont
 from tkinter.messagebox import showinfo
 from src.jeu import Plateau
 from src.jeu import Modele
+from src.reseau import Reseau
+
 
 class Fenetre:
     def __init__(self,modele):
@@ -290,18 +291,30 @@ class Fenetre:
         
         Button(self.winDuree,text='VALIDER',command=lambda:self.nouveau2Joueurs(varTaille,value)).grid(row=3,column=0,pady=5)
         Button(self.winDuree,text='ANNULER',command=self.winDuree.destroy).grid(row=3,column=1,pady=5)
-                
-    def nouveau2Joueurs(self,taille,duree):
-        
-        try:
-            duree.get()
-            self.modele.nouveauPlateau(taille,taille,2)
-            self.lancer_horloge(duree.get())
-            self.maj()
-            self.winDuree.destroy()
-        except :
-            Label(self.winDuree, text="Erreur: Il faut un entier !",fg="red").grid(row=2,column=0,columnspan=2)
             
+    def nouveau2Joueurs(self,taille,duree):
+        print("att")
+        
+        self.reseau = Reseau.Reseau()
+        
+        self.reseau.connexion()
+        
+        self.maj()
+        self.winDuree.destroy()
+        
+        
+    #===========================================================================
+    # def nouveau2Joueurs(self,taille,duree):
+    #     try:
+    #         duree.get()
+    #         self.modele.nouveauPlateau(taille,taille,2)
+    #         self.lancer_horloge(duree.get())
+    #         self.maj()
+    #         self.winDuree.destroy()
+    #     except :
+    #         Label(self.winDuree, text="Erreur: Il faut un entier !",fg="red").grid(row=2,column=0,columnspan=2)    
+    #===========================================================================
+    
     def nouveau(self,taille,joueur):
         if (taille!=0 and joueur!=0):
             if (joueur==1):
