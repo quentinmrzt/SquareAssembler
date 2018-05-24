@@ -12,8 +12,7 @@ class Plateau:
         self.nbCouleur = int(x/2.5)
         self.listeCouleur = ["white","red","blue","yellow","green","cyan","magenta","violet","orange"]
         
-        self.aleatoire()
-
+        #self.aleatoire()
                         
     def aleatoire(self):
         nbParCouleur = [int((self.tailleX*self.tailleY)/self.nbCouleur)] * self.nbCouleur
@@ -32,6 +31,32 @@ class Plateau:
                         trouve = True
                 y = y+1
             x = x+1
+            
+    def listePlateau(self, listeMap):        
+        self.l_map = [[0]*self.tailleX for i in range(self.tailleY)]
+        
+        i = 0
+        y = 0
+        while y<self.tailleY:
+            x = 0
+            while x<self.tailleX:
+                self.l_map[y][x] = listeMap[i]
+                i += 1
+                x = x+1
+            y = y+1
+            
+    def getPlateauLineaire(self):
+        liste = []
+        
+        y = 0
+        while y<self.tailleY:
+            x = 0
+            while x<self.tailleX:
+                liste.append(self.l_map[y][x])
+                x = x+1
+            y = y+1
+        
+        return liste
 
     def getCouleur(self, x, y):
         if(x>=0 and x<self.tailleX and y>=0 and y<self.tailleY):
@@ -39,6 +64,7 @@ class Plateau:
     
     def marquage(self,x,y):
         self.l_map[y][x] = -self.l_map[y][x]
+      
     def demarquage(self):
         x=0
         while(x<self.tailleX):
@@ -78,8 +104,7 @@ class Plateau:
             nbVoisin += self.parcoursProfondeurNbVoisin(x-1, y)
 
         return nbVoisin
-    
-    
+        
     def supprime(self,x,y):
         nb = self.nbSupprimable(x,y)
         if(nb!=0):

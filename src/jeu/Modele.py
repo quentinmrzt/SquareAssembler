@@ -20,6 +20,8 @@ class Modele:
         self.tailleY = 0
         
         self.tourDeJeu = None
+        
+        self.joueurNumero = 0
 
     def existePlateau(self):
         return (self.plateau!=None)
@@ -41,8 +43,7 @@ class Modele:
             if(couleur in self.listeCouleurRestante):
                 self.listeCouleurJ2.append(couleur)
                 self.listeCouleurRestante.remove(couleur)
-
-    
+   
     def supprimerCase(self,x,y,joueur=1):
         couleur = self.plateau.getCouleur(x,y)
         if(couleur=="white"):
@@ -105,7 +106,34 @@ class Modele:
 
         self.tailleX = x
         self.tailleY = y
+        
         self.plateau = Plateau.Plateau(x,y)
+        self.plateau.aleatoire()
+        
+        self.scoreJ1 = 0
+        self.scoreJ2 = 0
+        self.tourDeJeu = 1
+                
+        self.listeCouleurJ1.clear()
+        self.listeCouleurJ2.clear()
+        self.listeCouleurRestante.clear()
+        
+        i = 1
+        while(i<=self.plateau.nbCouleur):
+            self.listeCouleurRestante.append(self.plateau.listeCouleur[i])
+            i = i+1
+            
+    def nouveauPlateauListe(self, taille, listeMap):
+        self.enJeu = True
+        self.nombrePartie += 1
+        self.nbJoueur = 2
+
+        self.tailleX = taille
+        self.tailleY = taille
+        
+        self.plateau = Plateau.Plateau(self.tailleX, self.tailleY)
+        self.plateau.listePlateau(listeMap)
+        
         self.scoreJ1 = 0
         self.scoreJ2 = 0
         self.tourDeJeu = 1
