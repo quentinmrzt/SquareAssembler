@@ -28,10 +28,10 @@ class Fenetre:
         # Menu Jeu et ses sous menu
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="Nouveau", command=self.fenetreChoix)
-        filemenu.add_command(label="Nouveau en ligne", command=self.fenetreConnexion)
+        filemenu.add_command(label="Nouveau en ligne", command=self.boutonConnexion)
 
         filemenu.add_separator()
-        filemenu.add_command(label="Quitter", command=self.root.quit)
+        filemenu.add_command(label="Quitter", command=self.fermeture)
         menubar.add_cascade(label="Jeu", menu=filemenu)
         # Menu "A propos" et son sous menu
         editmenu = Menu(menubar, tearoff=0)
@@ -66,20 +66,21 @@ class Fenetre:
         
         self.dureeTour = -1
         self.temps = -1
+        self.messageRejouez = False
         
+        # PARTIE RESEAU
         self.reseau = None
-        self.modeEnLigne = False
         
-        
-        
+        self.iniIvy = False
+        self.surLeReseau = False
+        self.connexion = False
         
         self.maj()
         self.root.protocol("WM_DELETE_WINDOW", self.fermeture)
         self.root.mainloop()
         
-        
-        
     def maj(self):
+        print("MAJ")
         self.canvasScore.delete("all")
         self.canvasPlateau.delete("all")
         
@@ -96,105 +97,11 @@ class Fenetre:
             
         # Gestion bouton passer
         if(self.modele.nbJoueur!=0):
-            if (self.modele.nbJoueur==1):
+            if (self.modele.nbJoueur==1 or not self.modele.enJeu):
                 self.boutonPasser.config(state="disabled")
             else:
                 self.boutonPasser.config(state="normal")
                         
-    def affichageTitre(self):
-        self.canvasScore.delete("all")
-        
-        # Titre
-        police = tkFont.Font(family='Impact', size=15)
-        self.canvasScore.create_text(self.tailleScoreX/2,15,text="SQUARE",font=police)
-        self.canvasScore.create_text(self.tailleScoreX/2,35,text="ASSEMBLER",font=police)
-        
-        if(self.modeEnLigne):
-            if(self.modele.joueurNumero == 1):
-                self.canvasScore.create_text(100,15,text=self.reseau.nom, font=police,fill="black")
-                self.canvasScore.create_text(self.tailleScoreX-100,15,text=self.reseau.nomAdversaire,font=police,fill="black")
-            else:
-                self.canvasScore.create_text(self.tailleScoreX-100,15,text=self.reseau.nom,font=police,fill="black")
-                self.canvasScore.create_text(100,15,text=self.reseau.nomAdversaire, font=police,fill="black")
-                
-            self.canvasScore.create_text(100,35,text=self.strScore(1),font=police, fill="black")
-            self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2), font=police, fill="black")
-        else:
-            # Affichages des joueurs
-            if(self.modele.nbJoueur>=1):
-                color="black"
-            else:
-                color="grey"
-            
-            self.canvasScore.create_text(100,15,text="1UP",font=police,fill=color)  
-            self.canvasScore.create_text(100,35,text=self.strScore(1),font=police,fill=color)
-                
-            if(self.modele.nbJoueur>=2):
-                color="black"
-            else:
-                color="grey"
-                
-            self.canvasScore.create_text(self.tailleScoreX-100,15,text="2UP",font=police,fill=color)
-            self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2),font=police,fill=color)
-        
-        # Ligne de séparation
-        #self.canvasScore.create_line(0, 50, self.tailleScoreX, 50, width=2)
-        
-        # Ligne de séparation
-        self.canvasScore.create_line(0, 45, 50, 45, width=2) # ---
-        
-        if(self.modele.tourDeJeu==1):
-            self.canvasScore.create_line(50, 5, 50, 50, width=2) # |
-            self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
-            self.canvasScore.create_line(50, 5 , 150, 5, width=2) # ---
-            self.canvasScore.create_line(150, 50, 150, 5, width=2) # |
-        else:
-            self.canvasScore.create_line(50, 45, 50, 50, width=2) # |
-            self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
-            self.canvasScore.create_line(150, 50, 150, 45, width=2) # |
-        
-        self.canvasScore.create_line(150, 45 , (self.tailleScoreX/2)-60, 45, width=2) # ---
-        
-        self.canvasScore.create_line((self.tailleScoreX/2)-60, 45, (self.tailleScoreX/2)-60, 50, width=2) # |
-        self.canvasScore.create_line((self.tailleScoreX/2)-60, 50 , (self.tailleScoreX/2)+60, 50, width=2) # ---
-        self.canvasScore.create_line((self.tailleScoreX/2)+60, 50, (self.tailleScoreX/2)+60, 45, width=2) # |
-        
-        self.canvasScore.create_line((self.tailleScoreX/2)+60, 45 , self.tailleScoreX-150, 45, width=2) # ---
-        
-        if(self.modele.tourDeJeu==2):
-            self.canvasScore.create_line(self.tailleScoreX-150, 5 , self.tailleScoreX-150, 50, width=2) # |
-            self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
-            self.canvasScore.create_line(self.tailleScoreX-150, 5, self.tailleScoreX-50, 5, width=2) # ---
-            self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 5, width=2) # |
-        else:
-            self.canvasScore.create_line(self.tailleScoreX-150, 45 , self.tailleScoreX-150, 50, width=2) # |
-            self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
-            self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 45, width=2) # |
-        
-        self.canvasScore.create_line(self.tailleScoreX-50, 45 ,self.tailleScoreX, 45, width=2) # ---
-        
-        # Affichage des carrés de couleurs
-        tailleCarre = 14
-        y = 54  
-        x = 100-(len(self.modele.listeCouleurJ1)*tailleCarre)/2
-        
-        i = 0
-        while (i<len(self.modele.listeCouleurJ1)):
-            self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ1[i])
-            i = i+1
-            
-        x = (self.tailleScoreX-100)-(len(self.modele.listeCouleurJ2*tailleCarre))/2
-        i = 0
-        while (i<len(self.modele.listeCouleurJ2)):
-            self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ2[i])
-            i = i+1
-            
-        x = (self.tailleScoreX/2)-(len(self.modele.listeCouleurRestante)*tailleCarre)/2
-        i = 0
-        while (i<len(self.modele.listeCouleurRestante)):
-            self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurRestante[i])
-            i = i+1
-
     def affichagePlateau(self):
         self.canvasPlateau.delete("all")
             
@@ -210,6 +117,7 @@ class Fenetre:
             x = x+1
     
     def affichageFinDePartie(self):
+        print("fin de partie")
         police = tkFont.Font(family='Impact', size=30)
         self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2-20,text="FIN DU JEU",font=police)
             
@@ -217,23 +125,46 @@ class Fenetre:
             self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="SCORE FINAL: "+str(self.modele.scoreJ1),font=police)
             
         if(self.modele.nbJoueur==2):
-            if(self.modele.scoreJ1>self.modele.scoreJ2):
-                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 1",font=police)
-            else:
-                if(self.modele.scoreJ2>self.modele.scoreJ1):
-                    self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 2",font=police)
+            if(self.connexion):
+                if(self.modele.scoreJ1>self.modele.scoreJ2):
+                    if(self.modele.joueurNumero == 1):
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE",font=police)
+                    else:
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="DEFAITE",font=police)
                 else:
-                    self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="EGALITE",font=police)
+                    if(self.modele.scoreJ2>self.modele.scoreJ1):
+                        if(self.modele.joueurNumero == 2):
+                            self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE",font=police)
+                        else:
+                            self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="DEFAITE",font=police)
+                    else:
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="EGALITE",font=police)
+            else:
+                if(self.modele.scoreJ1>self.modele.scoreJ2):
+                    self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 1",font=police)
+                else:
+                    if(self.modele.scoreJ2>self.modele.scoreJ1):
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="VICTOIRE JOUEUR 2",font=police)
+                    else:
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="EGALITE",font=police)
                         
-    
-    
     def changementTour(self):
-        self.modele.passerTour()
-        
-        #self.temps = self.dureeTour
-        
-        #self.majHorloge() # pour afficher le nouveau temps
-        self.maj() # pour afficher le joueur
+        if(self.modele.enJeu):
+            if(not self.modele.passerTour()):
+                police = tkFont.Font(family='Impact', size=30)
+                self.maj()
+                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="REJOUEZ",font=police)
+                self.messageRejouez = True
+            else:
+                print("coucou")
+                self.maj()
+            
+            self.temps = self.dureeTour
+            
+            self.majHorloge() # pour afficher le nouveau temps
+        else:
+            if(self.modele.nbJoueur==2):
+                self.maj()
         
     def majHorloge(self):
         if(self.modele.enJeu and self.modele.nbJoueur==2):
@@ -367,19 +298,188 @@ class Fenetre:
 
     def nouveau(self,taille,joueur):
         if (taille!=0 and joueur!=0):
+            if(self.surLeReseau):
+                self.reseau.on_die()
+                self.surLeReseau = False
+                self.connexion = False
+            
             if (joueur==1):
+                print("lol 3")
                 self.modele.nouveauPlateau(taille,taille,joueur)
                 self.maj()
             else:
                 self.fenetreDuree(taille)
             
             self.win.destroy()  
-    
-    
-    
+            
     # PARTIE 1 joueur / 2 joueurs / Réseau
+    def affichageTitre(self):
+        self.canvasScore.delete("all")
+        
+        # Titre
+        police = tkFont.Font(family='Impact', size=15)
+        self.canvasScore.create_text(self.tailleScoreX/2,15,text="SQUARE",font=police)
+        self.canvasScore.create_text(self.tailleScoreX/2,35,text="ASSEMBLER",font=police)
+        
+        if(self.connexion):
+            print("AFFICHAGETITRECONNEXION")
+            if(self.modele.joueurNumero == 1):
+                self.canvasScore.create_text(100,15,text=self.reseau.nom, font=police,fill="black")
+                self.canvasScore.create_text(self.tailleScoreX-100,15,text=self.reseau.nomAdversaire,font=police,fill="black")
+            else:
+                self.canvasScore.create_text(100,15,text=self.reseau.nom, font=police,fill="black")
+                self.canvasScore.create_text(self.tailleScoreX-100,15,text=self.reseau.nomAdversaire,font=police,fill="black")
+                
+            # Affichage du score
+            if(self.modele.joueurNumero==1):
+                self.canvasScore.create_text(100,35,text=self.strScore(1),font=police, fill="black")
+                self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2), font=police, fill="black")
+            else:
+                self.canvasScore.create_text(100,35,text=self.strScore(2),font=police, fill="black")
+                self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(1), font=police, fill="black")
+        else:
+            print("AFFICHAGETITREPASCONNEXION")
+            # Affichages des joueurs
+            if(self.modele.nbJoueur>=1):
+                color="black"
+            else:
+                color="grey"
+            
+            self.canvasScore.create_text(100,15,text="1UP",font=police,fill=color)  
+            self.canvasScore.create_text(100,35,text=self.strScore(1),font=police,fill=color)
+                
+            if(self.modele.nbJoueur>=2):
+                color="black"
+            else:
+                color="grey"
+                
+            self.canvasScore.create_text(self.tailleScoreX-100,15,text="2UP",font=police,fill=color)
+            self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(2),font=police,fill=color)
+        
+        # Ligne de séparation
+        #self.canvasScore.create_line(0, 50, self.tailleScoreX, 50, width=2)
+        
+        # Ligne de séparation
+        self.canvasScore.create_line(0, 45, 50, 45, width=2) # ---
+        
+        # Affichage du joueur courant
+        if(self.connexion):
+            if(self.modele.joueurNumero == self.modele.tourDeJeu):
+                self.canvasScore.create_line(50, 5, 50, 50, width=2) # |
+                self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+                self.canvasScore.create_line(50, 5 , 150, 5, width=2) # ---
+                self.canvasScore.create_line(150, 50, 150, 5, width=2) # |
+            else:
+                self.canvasScore.create_line(50, 45, 50, 50, width=2) # |
+                self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+                self.canvasScore.create_line(150, 50, 150, 45, width=2) # |
+        else:
+            if(self.modele.tourDeJeu==1):
+                self.canvasScore.create_line(50, 5, 50, 50, width=2) # |
+                self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+                self.canvasScore.create_line(50, 5 , 150, 5, width=2) # ---
+                self.canvasScore.create_line(150, 50, 150, 5, width=2) # |
+            else:
+                self.canvasScore.create_line(50, 45, 50, 50, width=2) # |
+                self.canvasScore.create_line(50, 50 , 150, 50, width=2) # ---
+                self.canvasScore.create_line(150, 50, 150, 45, width=2) # |
+        
+        self.canvasScore.create_line(150, 45 , (self.tailleScoreX/2)-60, 45, width=2) # ---
+        
+        self.canvasScore.create_line((self.tailleScoreX/2)-60, 45, (self.tailleScoreX/2)-60, 50, width=2) # |
+        self.canvasScore.create_line((self.tailleScoreX/2)-60, 50 , (self.tailleScoreX/2)+60, 50, width=2) # ---
+        self.canvasScore.create_line((self.tailleScoreX/2)+60, 50, (self.tailleScoreX/2)+60, 45, width=2) # |
+        
+        self.canvasScore.create_line((self.tailleScoreX/2)+60, 45 , self.tailleScoreX-150, 45, width=2) # ---
+        
+        # Affichage du joueur ennemi
+        if(self.connexion):
+            if(self.modele.joueurNumero != self.modele.tourDeJeu):
+                self.canvasScore.create_line(self.tailleScoreX-150, 5 , self.tailleScoreX-150, 50, width=2) # |
+                self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-150, 5, self.tailleScoreX-50, 5, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 5, width=2) # |
+            else:
+                self.canvasScore.create_line(self.tailleScoreX-150, 45 , self.tailleScoreX-150, 50, width=2) # |
+                self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 45, width=2) # |
+        else:
+            if(self.modele.tourDeJeu==2):
+                self.canvasScore.create_line(self.tailleScoreX-150, 5 , self.tailleScoreX-150, 50, width=2) # |
+                self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-150, 5, self.tailleScoreX-50, 5, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 5, width=2) # |
+            else:
+                self.canvasScore.create_line(self.tailleScoreX-150, 45 , self.tailleScoreX-150, 50, width=2) # |
+                self.canvasScore.create_line(self.tailleScoreX-150, 50, self.tailleScoreX-50, 50, width=2) # ---
+                self.canvasScore.create_line(self.tailleScoreX-50, 50 , self.tailleScoreX-50, 45, width=2) # |
+        
+        self.canvasScore.create_line(self.tailleScoreX-50, 45 ,self.tailleScoreX, 45, width=2) # ---
+        
+        # Affichage des carrés de couleurs
+        tailleCarre = 14
+        y = 54  
+        
+        
+        if(self.connexion):
+            if(self.modele.joueurNumero == 1):
+                # Couleur du joueur 1
+                x = 100-(len(self.modele.listeCouleurJ1)*tailleCarre)/2
+                i = 0
+                while (i<len(self.modele.listeCouleurJ1)):
+                    self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ1[i])
+                    i = i+1
+                
+                # Couleur du joueur 2
+                x = (self.tailleScoreX-100)-(len(self.modele.listeCouleurJ2*tailleCarre))/2
+                i = 0
+                while (i<len(self.modele.listeCouleurJ2)):
+                    self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ2[i])
+                    i = i+1
+            else:
+                # Couleur du joueur 1
+                x = (self.tailleScoreX-100)-(len(self.modele.listeCouleurJ2*tailleCarre))/2
+                
+                i = 0
+                while (i<len(self.modele.listeCouleurJ1)):
+                    self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ1[i])
+                    i = i+1
+                
+                # Couleur du joueur 2
+                x = 100-(len(self.modele.listeCouleurJ1)*tailleCarre)/2
+                i = 0
+                while (i<len(self.modele.listeCouleurJ2)):
+                    self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ2[i])
+                    i = i+1
+                
+            # Couleur restante
+            x = (self.tailleScoreX/2)-(len(self.modele.listeCouleurRestante)*tailleCarre)/2
+            i = 0
+            while (i<len(self.modele.listeCouleurRestante)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurRestante[i])
+                i = i+1
+        else:
+            # Couleur du joueur 1
+            x = 100-(len(self.modele.listeCouleurJ1)*tailleCarre)/2
+            i = 0
+            while (i<len(self.modele.listeCouleurJ1)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ1[i])
+                i = i+1
+                
+            x = (self.tailleScoreX-100)-(len(self.modele.listeCouleurJ2*tailleCarre))/2
+            i = 0
+            while (i<len(self.modele.listeCouleurJ2)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurJ2[i])
+                i = i+1
+                
+            x = (self.tailleScoreX/2)-(len(self.modele.listeCouleurRestante)*tailleCarre)/2
+            i = 0
+            while (i<len(self.modele.listeCouleurRestante)):
+                self.canvasScore.create_rectangle(x+tailleCarre*i,y,x+tailleCarre+tailleCarre*i,y+tailleCarre,fill=self.modele.listeCouleurRestante[i])
+                i = i+1
+    
     def boutonChangementTour(self):        
-        if(self.modeEnLigne):
+        if(self.connexion):
             if(self.modele.tourDeJeu == self.modele.joueurNumero):
                 self.changementTour()
             
@@ -390,33 +490,51 @@ class Fenetre:
         #self.temps = self.dureeTour
         
         #self.majHorloge() # pour afficher le nouveau temps
-        self.maj()
+        #self.maj()
        
     def cliqueGauche(self,event): 
         if(self.modele.enJeu and self.modele.existePlateau()):
-            tailleCarre = 600/self.modele.tailleX
-            
-            x = (int)(event.x/tailleCarre)
-            y = (int)(event.y/tailleCarre)
-        
-            if(x>=0 and x<self.modele.tailleX and y>=0 and y<self.modele.tailleY):
-                if(self.modeEnLigne):
-                    if(self.modele.tourDeJeu == self.modele.joueurNumero):
-                        passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
-                        if(passerLeTour):
-                            self.reseau.envoyer("click: "+str(x)+" "+str(y)+" ")
-                            self.changementTour()
-                else:
-                    passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
-                    
-                    # si deux joueur est coup valide
-                    if(self.modele.nbJoueur==2 and passerLeTour):
-                        self.changementTour()
-                        
+            if(self.messageRejouez):
+                self.messageRejouez = False
                 self.maj()
+            else:
+                tailleCarre = 600/self.modele.tailleX
                 
-          
+                x = (int)(event.x/tailleCarre)
+                y = (int)(event.y/tailleCarre)
+            
+                if(x>=0 and x<self.modele.tailleX and y>=0 and y<self.modele.tailleY):
+                    if(self.connexion):
+                        if(self.modele.tourDeJeu == self.modele.joueurNumero):
+                            passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
+                            if(passerLeTour):
+                                self.reseau.envoyer("click: "+str(x)+" "+str(y)+" ")
+                                self.changementTour()
+                    else:
+                        passerLeTour = self.modele.supprimerCase(x,y,self.modele.tourDeJeu)
+                        
+                        # si deux joueur est coup valide
+                        if(self.modele.nbJoueur==2 and passerLeTour):
+                            self.changementTour()
+                        else:
+                            self.maj()
+                            
+                    #self.maj()
+                
     # PARTIE 2 JOUEURS RESEAU
+    def boutonConnexion(self):
+        if(self.surLeReseau):
+            if(self.connexion):
+                if(self.reseau.estServeur):
+                    self.fenetreChoixEnLigne()
+                else:
+                    self.reseau.envoyer("nouvelle partie")
+        else:
+            if(self.iniIvy):
+                self.connexion2Joueur(self.reseau.nom)
+            else:
+                self.fenetreConnexion()
+    
     def fenetreConnexion(self):
         tailleX = 200
         tailleY = 100
@@ -447,34 +565,44 @@ class Fenetre:
         Button(self.winCo,text='CONNEXION',command=lambda:self.connexion2Joueur(value.get())).grid(row=3,column=0,pady=5)
         Button(self.winCo,text='ANNULER',command=self.winCo.destroy).grid(row=3,column=1,pady=5)
     
-    
-    def connexion2Joueur(self, nom):
-        self.reseau = Reseau.Reseau(nom) 
+    def connexion2Joueur(self, nom):        
+        if(not self.iniIvy):
+            print("Je rentre dans l'ini")
+            self.reseau = Reseau.Reseau(self, nom)
+            
+            self.reseau.initialisation()
+            self.iniIvy = True
+            
         self.reseau.connexion()
+        self.surLeReseau = True
         
         police = tkFont.Font(family='Impact', size=20)
         self.canvasPlateau.delete("all")
         self.canvasPlateau.create_text(300,50,text="EN ATTENTE D'UN DEUXIEME JOUEUR",font=police)
         
-        self.winCo.destroy()
+        self.modele.enJeu = False
         
-        self.attente2Joueurs()
-     
-    def attente2Joueurs(self):
-        if(self.reseau.estPret):
-            
-            
-            print("Est connecté + Serveur prêt !")
-
-            if(self.reseau.estServeur):
-                self.fenetreChoixEnLigne()
-            else:
-                self.attenteInformations()
-
-            self.maj()
-        else:
-            self.root.after(100, self.attente2Joueurs)
-            
+        self.winCo.destroy()
+    
+    def connexionReussi(self):
+        print("Le lien est établit")
+        
+        if(self.reseau.estServeur):
+            self.fenetreChoixEnLigne()
+        
+        self.maj()
+        
+    def deconnexion(self):
+        print("DECONEXION")
+        self.connexion = False
+        
+        self.modele.supprimerPlateau()
+        
+        police = tkFont.Font(family='Impact', size=20)
+        self.canvasPlateau.delete("all")
+        self.canvasPlateau.create_text(300,50,text="LE JOUEUR "+self.reseau.nomAdversaire+" EST DECONNECTE",font=police)
+        self.canvasPlateau.create_text(300,100,text="EN ATTENTE D'UN DEUXIEME JOUEUR",font=police)
+                    
     def fenetreChoixEnLigne(self):
         tailleX = 300
         tailleY = 200
@@ -511,76 +639,84 @@ class Fenetre:
 
         Button(self.win,text='VALIDER',command=lambda:self.nouveau2JoueursEnLigne(varTaille.get(),value.get())).grid(row=5,column=0)
         Button(self.win,text='ANNULER',command=self.win.destroy).grid(row=5,column=1)
+    
+    def demandeNouvellePartie(self):
+        win = Toplevel(self.root)
         
+        strtmp = "Le joueur "+self.reseau.nomAdversaire+" demande de faire une nouvelle partie. Acceptez-vous ?"
+        lb = Label(win, text=strtmp)
+        
+        tailleX = lb.winfo_reqwidth()
+        tailleY = 50
+        
+        numero = str(self.root.geometry()).split('+')
+        posX = int(numero[1])
+        posY = int(numero[2])
+        
+        positionX = int(posX + (self.tailleEcranX/2) - (tailleX/2))
+        positionY = int(posY + (self.tailleEcranY/2) - (tailleY/2))
+
+        geo = str(tailleX) + "x" + str(tailleY) + "+" + str(positionX) + "+" + str(positionY)
+        
+        win.geometry(geo)
+        win.title("Demande")
+        win.resizable(width=False,height=False)
+        
+        lb.grid(row=0,column=0,columnspan=2)
+
+        Button(win,text='OUI',command=lambda:[self.fenetreChoixEnLigne(), win.destroy()]).grid(row=1,column=0)
+        Button(win,text='NON',command=win.destroy).grid(row=1,column=1)
+              
     def nouveau2JoueursEnLigne(self,taille,duree):
-        self.modele.nouveauPlateau(taille,taille,2)
-        #self.lancer_horloge(duree)
+        # QUE POUR LA PARTIE SERVEUR
+        if((taille==10 or taille==20) and duree>=0):
+            self.modele.nouveauPlateau(taille,taille,2)
+            
+            
+            self.win.destroy()
+                
+            # on envoie le modele
+            self.reseau.envoyer("tour: "+str(duree)+" ")
+            self.reseau.envoyer("taille: "+str(taille)+" ")
+            self.reseau.envoyer("map: "+str(self.modele.plateau.getPlateauLineaire())+" ")
+            self.reseau.envoyer("Infos ok")
+            
+            self.connexion = True
+            self.modele.joueurNumero = 1
+            
+            self.lancer_horloge(duree)
+            self.maj()
+    
+    def chargementInformations(self):
+        # QUE POUR LA PARTIE CLIENT 
+        print("CHARGEMENT DES INFOS")
+        
+        self.connexion = True
+        
+        self.modele.joueurNumero = 2
+        
+        print(self.reseau.taille)
+        
+        self.modele.nouveauPlateauListe(self.reseau.taille, self.reseau.map)
+        
+        print("Timer "+str(self.reseau.dureeTour))
+        self.lancer_horloge(self.reseau.dureeTour)
+        
         self.maj()
         
-        self.win.destroy()
-            
-        # on envoie le modele
-        self.reseau.envoyer("nom: "+self.reseau.nom+" ")
-        
-        self.reseau.dureeTour = duree
-        self.reseau.envoyer("tour: "+str(duree)+" ")
-            
-        self.reseau.taille = taille
-        self.reseau.envoyer("taille: "+str(taille)+" ")
-        
-        self.reseau.envoyer("map: "+str(self.modele.plateau.getPlateauLineaire())+" ")
-        
-        
-        
-        self.attenteInformations()
-        
-    def attenteInformations(self):   
-        if(self.reseau.aInformation()):
-            print("Toutes les informations sont dispos")
-            
-            self.modeEnLigne = True
-            
-            if (self.reseau.estServeur):
-                self.modele.joueurNumero = 1
-            else:
-                self.modele.joueurNumero = 2
-                self.reseau.envoyer("Infos ok")
-                self.modele.nouveauPlateauListe(self.reseau.taille, self.reseau.map)
-            
-            self.maj()     
-            self.attenteActions()
-        else:
-            #print("Données en att")
-            self.root.after(100, self.attenteInformations)
-        
-    def attenteActions(self):        
+    def cliqueReseau(self, x, y):
         if(self.modele.tourDeJeu != self.modele.joueurNumero):
-            
-            # On vérifie que l'adversaire à cliqué
-            if(self.reseau.click):
-                self.actionAdversaire(self.reseau.x, self.reseau.y)
-                
-                self.reseau.x = None
-                self.reseau.y = None
-                self.reseau.click = False
-                
-            if(self.reseau.passerTour):
-                self.changementTour()
-                
-                self.reseau.passerTour = False
-        
-        if(self.modeEnLigne):
-            self.root.after(100, self.attenteActions)
-        
-    def actionAdversaire(self, x, y):
-        if(self.modele.enJeu and self.modele.existePlateau()):
-            if(self.modeEnLigne):
-                self.modele.supprimerCase(x, y, self.modele.tourDeJeu)
-                self.changementTour()
-                self.maj()
+            if(self.modele.enJeu and self.modele.existePlateau()):
+                if(self.connexion):
+                    self.modele.supprimerCase(x, y, self.modele.tourDeJeu)
+                    self.changementTour()
+                    self.maj()        
                 
     def fermeture(self):
-        if(self.reseau!=None):
-            self.modeEnLigne = False
+        if(self.surLeReseau):
             self.reseau.on_die()
-            sys.exit()
+        
+        sys.exit()
+        
+        
+        

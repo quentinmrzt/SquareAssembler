@@ -95,9 +95,17 @@ class Modele:
             if(self.tourDeJeu==1):
                 if(self.plateau.estJouableTest(self.listeCouleurJ2+self.listeCouleurRestante)):
                     self.changementJoueur()
+                    return True
+                else:
+                    return False
             else:
                 if(self.plateau.estJouableTest(self.listeCouleurJ1+self.listeCouleurRestante)):
                     self.changementJoueur()
+                    return True
+                else:
+                    return False
+        else:
+            return True
                     
     def nouveauPlateau(self,x,y,nb):
         self.enJeu = True
@@ -122,7 +130,29 @@ class Modele:
         while(i<=self.plateau.nbCouleur):
             self.listeCouleurRestante.append(self.plateau.listeCouleur[i])
             i = i+1
-            
+    
+    def supprimerPlateau(self):
+        self.enJeu = False
+        self.plateau = None
+        
+        self.scoreJ1 = 0
+        self.listeCouleurJ1 = []
+        self.scoreJ2 = 0
+        self.listeCouleurJ2 = []
+        
+        self.listeCouleurRestante = []
+                
+        self.nbJoueur = 0
+        self.joueurNumero = 0
+        
+        self.enJeu = False
+                
+        self.tailleX = 0
+        self.tailleY = 0
+        
+        self.tourDeJeu = None
+    
+    
     def nouveauPlateauListe(self, taille, listeMap):
         self.enJeu = True
         self.nombrePartie += 1
