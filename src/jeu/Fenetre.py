@@ -80,7 +80,6 @@ class Fenetre:
         self.root.mainloop()
         
     def maj(self):
-        print("MAJ")
         self.canvasScore.delete("all")
         self.canvasPlateau.delete("all")
         
@@ -117,7 +116,6 @@ class Fenetre:
             x = x+1
     
     def affichageFinDePartie(self):
-        print("fin de partie")
         police = tkFont.Font(family='Impact', size=30)
         self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2-20,text="FIN DU JEU",font=police)
             
@@ -156,7 +154,6 @@ class Fenetre:
                 self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="REJOUEZ",font=police)
                 self.messageRejouez = True
             else:
-                print("coucou")
                 self.maj()
             
             self.temps = self.dureeTour
@@ -220,7 +217,7 @@ class Fenetre:
     
     def fenetreChoix(self):
         tailleX = 300
-        tailleY = 260
+        tailleY = 230
         
         numero = str(self.root.geometry()).split('+')
         posX = int(numero[1])
@@ -304,7 +301,6 @@ class Fenetre:
                 self.connexion = False
             
             if (joueur==1):
-                print("lol 3")
                 self.modele.nouveauPlateau(taille,taille,joueur)
                 self.maj()
             else:
@@ -322,7 +318,6 @@ class Fenetre:
         self.canvasScore.create_text(self.tailleScoreX/2,35,text="ASSEMBLER",font=police)
         
         if(self.connexion):
-            print("AFFICHAGETITRECONNEXION")
             if(self.modele.joueurNumero == 1):
                 self.canvasScore.create_text(100,15,text=self.reseau.nom, font=police,fill="black")
                 self.canvasScore.create_text(self.tailleScoreX-100,15,text=self.reseau.nomAdversaire,font=police,fill="black")
@@ -338,7 +333,6 @@ class Fenetre:
                 self.canvasScore.create_text(100,35,text=self.strScore(2),font=police, fill="black")
                 self.canvasScore.create_text(self.tailleScoreX-100,35,text=self.strScore(1), font=police, fill="black")
         else:
-            print("AFFICHAGETITREPASCONNEXION")
             # Affichages des joueurs
             if(self.modele.nbJoueur>=1):
                 color="black"
@@ -567,7 +561,6 @@ class Fenetre:
     
     def connexion2Joueur(self, nom):        
         if(not self.iniIvy):
-            print("Je rentre dans l'ini")
             self.reseau = Reseau.Reseau(self, nom)
             
             self.reseau.initialisation()
@@ -576,24 +569,24 @@ class Fenetre:
         self.reseau.connexion()
         self.surLeReseau = True
         
+        self.modele.enJeu = False
+        self.maj()
+        
         police = tkFont.Font(family='Impact', size=20)
         self.canvasPlateau.delete("all")
         self.canvasPlateau.create_text(300,50,text="EN ATTENTE D'UN DEUXIEME JOUEUR",font=police)
         
-        self.modele.enJeu = False
+
         
         self.winCo.destroy()
     
-    def connexionReussi(self):
-        print("Le lien est établit")
-        
+    def connexionReussi(self):        
         if(self.reseau.estServeur):
             self.fenetreChoixEnLigne()
         
         self.maj()
         
     def deconnexion(self):
-        print("DECONEXION")
         self.connexion = False
         
         self.modele.supprimerPlateau()
@@ -688,18 +681,13 @@ class Fenetre:
             self.maj()
     
     def chargementInformations(self):
-        # QUE POUR LA PARTIE CLIENT 
-        print("CHARGEMENT DES INFOS")
-        
+        # QUE POUR LA PARTIE CLIENT         
         self.connexion = True
         
         self.modele.joueurNumero = 2
         
-        print(self.reseau.taille)
-        
         self.modele.nouveauPlateauListe(self.reseau.taille, self.reseau.map)
         
-        print("Timer "+str(self.reseau.dureeTour))
         self.lancer_horloge(self.reseau.dureeTour)
         
         self.maj()

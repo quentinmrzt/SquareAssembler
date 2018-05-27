@@ -56,10 +56,8 @@ class Reseau:
             test4 = float(test3)
             
             if(test4<self.temps):
-                print("Je suis l'esclave")
                 self.estServeur = False
             else:
-                print("Je suis le serveur")
                 self.estServeur = True
                         
             self.fenetre.connexionReussi()
@@ -84,7 +82,6 @@ class Reseau:
             
             self.taille = test4
             
-            print(self.taille)
             self.infoTaille = True
             
         if("map:" in str(arg)):
@@ -101,7 +98,6 @@ class Reseau:
             self.infoPlateau = True
             
         if("Infos ok" in str(arg)):
-            print("coucou")
             self.fenetre.chargementInformations()
             
         if("click:" in str(arg)):
@@ -111,11 +107,9 @@ class Reseau:
             self.fenetre.cliqueReseau(int(test2[1]), int(test2[2]))
             
         if("passer tour" in str(arg)):
-            print("on passe le tour")
             self.fenetre.changementTour()
             
         if("nouvelle partie" in str(arg)):
-            print("nouvelle partie")
             self.fenetre.demandeNouvellePartie()
            
     def aInformation(self):
