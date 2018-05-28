@@ -149,11 +149,19 @@ class Fenetre:
     def changementTour(self):
         if(self.modele.enJeu):
             if(not self.modele.passerTour()):
-                police = tkFont.Font(family='Impact', size=30)
-                self.maj()
-                self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="REJOUEZ",font=police)
-                self.messageRejouez = True
+                if (self.connexion):
+                    if(self.modele.joueurNumero == self.modele.tourDeJeu):
+                        police = tkFont.Font(family='Impact', size=30)
+                        self.maj()
+                        self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="REJOUEZ",font=police)
+                        self.messageRejouez = True
+                else:
+                    police = tkFont.Font(family='Impact', size=30)
+                    self.maj()
+                    self.canvasPlateau.create_text(self.taillePlateauX/2,self.taillePlateauY/2+20,text="REJOUEZ",font=police)
+                    self.messageRejouez = True
             else:
+                self.messageRejouez = False
                 self.maj()
             
             self.temps = self.dureeTour
@@ -284,11 +292,11 @@ class Fenetre:
     
     def nouveau2Joueurs(self,taille,duree):
         try:
-            duree.get()
-            self.modele.nouveauPlateau(taille,taille,2)
-            self.lancer_horloge(duree.get())
-            self.maj()
-            self.winDuree.destroy()
+            if(duree.get()>0):
+                self.modele.nouveauPlateau(taille,taille,2)
+                self.lancer_horloge(duree.get())
+                self.maj()
+                self.winDuree.destroy()
 
         except :
             Label(self.winDuree, text="Erreur: Il faut un entier !",fg="red").grid(row=2,column=0,columnspan=2)  
@@ -547,38 +555,38 @@ class Fenetre:
         self.winCo.title("Créer une partie")
         self.winCo.resizable(width=False,height=False)
         
-        Label(self.winCo, text="Choisissez votre nom").grid(row=0,column=0,columnspan=2)
+        Label(self.winCo, text="Choisissez votre nom :").grid(row=0,column=0,columnspan=2)
+        
         
         value = StringVar()
         value.set("")
         entree = Entry(self.winCo, textvariable=value, width=30)
         entree.grid(row=1,column=0,columnspan=2,padx=7)
         
-        Label(self.winCo, text="").grid(row=2,column=0,columnspan=2)
+        Label(self.winCo, text="[9 caractères max. / sans espace]").grid(row=2,column=0,columnspan=2)
         
         Button(self.winCo,text='CONNEXION',command=lambda:self.connexion2Joueur(value.get())).grid(row=3,column=0,pady=5)
         Button(self.winCo,text='ANNULER',command=self.winCo.destroy).grid(row=3,column=1,pady=5)
     
-    def connexion2Joueur(self, nom):        
-        if(not self.iniIvy):
-            self.reseau = Reseau.Reseau(self, nom)
+    def connexion2Joueur(self, nom):       
+        if(not " " in nom and len(nom)<=9): 
+            if(not self.iniIvy):
+                self.reseau = Reseau.Reseau(self, nom)
+                
+                self.reseau.initialisation()
+                self.iniIvy = True
+                
+            self.reseau.connexion()
+            self.surLeReseau = True
             
-            self.reseau.initialisation()
-            self.iniIvy = True
+            self.modele.enJeu = False
+            self.maj()
             
-        self.reseau.connexion()
-        self.surLeReseau = True
-        
-        self.modele.enJeu = False
-        self.maj()
-        
-        police = tkFont.Font(family='Impact', size=20)
-        self.canvasPlateau.delete("all")
-        self.canvasPlateau.create_text(300,50,text="EN ATTENTE D'UN DEUXIEME JOUEUR",font=police)
-        
-
-        
-        self.winCo.destroy()
+            police = tkFont.Font(family='Impact', size=20)
+            self.canvasPlateau.delete("all")
+            self.canvasPlateau.create_text(300,50,text="EN ATTENTE D'UN DEUXIEME JOUEUR",font=police)
+            
+            self.winCo.destroy()
     
     def connexionReussi(self):        
         if(self.reseau.estServeur):
@@ -662,7 +670,7 @@ class Fenetre:
               
     def nouveau2JoueursEnLigne(self,taille,duree):
         # QUE POUR LA PARTIE SERVEUR
-        if((taille==10 or taille==20) and duree>=0):
+        if((taille==10 or taille==20) and duree>0):
             self.modele.nouveauPlateau(taille,taille,2)
             
             

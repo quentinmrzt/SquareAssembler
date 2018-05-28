@@ -37,30 +37,33 @@ class Reseau:
             self.message = str(arg)
         
         if ("is ready" in str(arg)):
-            self.connexion2joueurs = True
-            
-            test1 = str(arg)
-            test2 = test1.split(' ')
-            test3 = test2[1]
-            
-            self.nomAdversaire = str(test3)
-            self.infoNom = True
-                        
-            self.envoyer("time: "+str(self.temps)+" ")
-                        
+            if(not self.connexion2joueurs):
+                print(str(arg))
+                self.connexion2joueurs = True
+                
+                test1 = str(arg)
+                test2 = test1.split(' ')
+                test3 = test2[1]
+                
+                self.nomAdversaire = str(test3)
+                self.infoNom = True
+                
+                self.envoyer("time: "+str(self.temps)+" ")
+        
         # Qui est le serveur      
         if("time:" in str(arg)):
-            test1 = str(arg)
-            test2 = test1.split(' ')
-            test3 = test2[1]
-            test4 = float(test3)
-            
-            if(test4<self.temps):
-                self.estServeur = False
-            else:
-                self.estServeur = True
-                        
-            self.fenetre.connexionReussi()
+            if(self.connexion2joueurs):
+                test1 = str(arg)
+                test2 = test1.split(' ')
+                test3 = test2[1]
+                test4 = float(test3)
+                
+                if(test4<self.temps):
+                    self.estServeur = False
+                else:
+                    self.estServeur = True
+                            
+                self.fenetre.connexionReussi()
        
         # INFOS    
         # Pour récupérer la durée d'un tour
@@ -128,7 +131,7 @@ class Reseau:
     
     def initialisation(self):
         # initialising the bus 
-        readymsg = " "+self.nom + ' is ready' 
+        readymsg = ' ' + self.nom + ' is ready '
         
         IvyInit(self.nom, readymsg, 0, self.on_connection_change, self.on_die)
         
