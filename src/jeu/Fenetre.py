@@ -221,7 +221,7 @@ class Fenetre:
         return score
     
     def aPropos(self):
-        showinfo("Numéro d'anonymat", "Quentin Morizot / Rémi Pierron")    
+        showinfo("Numéro d'anonymat", "17820011 / 17820032")
     
     def fenetreChoix(self):
         tailleX = 300
