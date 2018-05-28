@@ -568,8 +568,8 @@ class Fenetre:
         Button(self.winCo,text='CONNEXION',command=lambda:self.connexion2Joueur(value.get())).grid(row=3,column=0,pady=5)
         Button(self.winCo,text='ANNULER',command=self.winCo.destroy).grid(row=3,column=1,pady=5)
     
-    def connexion2Joueur(self, nom):       
-        if(not " " in nom and len(nom)<=9): 
+    def connexion2Joueur(self, nom):
+        if(not " " in nom and len(nom)<=9 and nom!=""): 
             if(not self.iniIvy):
                 self.reseau = Reseau.Reseau(self, nom)
                 
@@ -634,12 +634,14 @@ class Fenetre:
         entree = Entry(self.win, textvariable=value, width=30)
         entree.grid(row=3,column=0,columnspan=2,padx=7)
         
+        Label(self.win, text="").grid(row=4,column=0,columnspan=2)
+        
         canvasLigne = Canvas(self.win, width=300, height=10)
         canvasLigne.create_line(10, 7, 290, 7)
-        canvasLigne.grid(row=4,column=0,columnspan=2)
+        canvasLigne.grid(row=5,column=0,columnspan=2)
 
-        Button(self.win,text='VALIDER',command=lambda:self.nouveau2JoueursEnLigne(varTaille.get(),value.get())).grid(row=5,column=0)
-        Button(self.win,text='ANNULER',command=self.win.destroy).grid(row=5,column=1)
+        Button(self.win,text='VALIDER',command=lambda:self.nouveau2JoueursEnLigne(varTaille,value)).grid(row=6,column=0)
+        Button(self.win,text='ANNULER',command=self.win.destroy).grid(row=6,column=1)
     
     def demandeNouvellePartie(self):
         win = Toplevel(self.root)
@@ -669,24 +671,27 @@ class Fenetre:
         Button(win,text='NON',command=win.destroy).grid(row=1,column=1)
               
     def nouveau2JoueursEnLigne(self,taille,duree):
-        # QUE POUR LA PARTIE SERVEUR
-        if((taille==10 or taille==20) and duree>0):
-            self.modele.nouveauPlateau(taille,taille,2)
-            
-            
-            self.win.destroy()
+        try:
+            # QUE POUR LA PARTIE SERVEUR
+            if(duree.get()>0 and (taille.get()==10 or taille.get()==20)):
+                self.modele.nouveauPlateau(taille.get(),taille.get(),2)
                 
-            # on envoie le modele
-            self.reseau.envoyer("tour: "+str(duree)+" ")
-            self.reseau.envoyer("taille: "+str(taille)+" ")
-            self.reseau.envoyer("map: "+str(self.modele.plateau.getPlateauLineaire())+" ")
-            self.reseau.envoyer("Infos ok")
-            
-            self.connexion = True
-            self.modele.joueurNumero = 1
-            
-            self.lancer_horloge(duree)
-            self.maj()
+                # on envoie le modele
+                self.reseau.envoyer("tour: "+str(duree.get())+" ")
+                self.reseau.envoyer("taille: "+str(taille.get())+" ")
+                self.reseau.envoyer("map: "+str(self.modele.plateau.getPlateauLineaire())+" ")
+                self.reseau.envoyer("Infos ok")
+                
+                self.connexion = True
+                self.modele.joueurNumero = 1
+                
+                self.win.destroy()
+                
+                self.lancer_horloge(duree.get())
+                self.maj()
+
+        except :
+            Label(self.win, text="Erreur: Il faut un entier !",fg="red").grid(row=4,column=0,columnspan=2)  
     
     def chargementInformations(self):
         # QUE POUR LA PARTIE CLIENT         
